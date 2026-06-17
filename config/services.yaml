@@ -44,5 +44,23 @@ services:
     App\Infrastructure\Event\Subscriber\LoanEventSubscriber:
         tags: { name: kernel.event_subscriber }
 
+    # Bind each adapter to its own Messenger bus (autowiring would inject the default bus).
+    App\Shared\Infrastructure\Bus\Messenger\MessengerCommandBus:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\Shared\Infrastructure\Bus\Messenger\MessengerQueryBus:
+        arguments:
+            $queryBus: '@query.bus'
+
+    App\Shared\Infrastructure\Bus\Messenger\MessengerEventBus:
+        arguments:
+            $eventBus: '@event.bus'
+
+    App\Shared\Application\Bus\Command\CommandBusInterface: '@App\Shared\Infrastructure\Bus\Messenger\MessengerCommandBus'
+    App\Shared\Application\Bus\Query\QueryBusInterface: '@App\Shared\Infrastructure\Bus\Messenger\MessengerQueryBus'
+    App\Shared\Application\Bus\Event\EventBusInterface: '@App\Shared\Infrastructure\Bus\Messenger\MessengerEventBus'
+    App\Shared\Application\Transaction\TransactionManagerInterface: '@App\Shared\Infrastructure\Persistence\DoctrineTransactionManager'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

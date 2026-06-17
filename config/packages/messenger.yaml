@@ -1,0 +1,23 @@
+framework:
+    messenger:
+        default_bus: command.bus
+        buses:
+            command.bus:
+                default_middleware:
+                    enabled: true
+                    allow_no_handlers: false
+            query.bus:
+                default_middleware:
+                    enabled: true
+                    allow_no_handlers: false
+            event.bus:
+                default_middleware:
+                    enabled: true
+                    allow_no_handlers: true
+
+        # No routing: messages are handled synchronously in-process. Routing domain
+        # events to an async transport here is a config change, not a code change.
+        # transports:
+        #     async: '%env(MESSENGER_TRANSPORT_DSN)%'
+        # routing:
+        #     'App\Shared\Domain\Event\DomainEvent': async
