@@ -10,10 +10,16 @@ PHP_RUN ?= docker compose run --rm -T php
 # symfony/process ^7.2 requirement does not clash with the app's symfony 7.1 pin.
 CS_FIXER = $(PHP_RUN) tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php
 
-.PHONY: phpstan cs-check cs-fix test test-unit test-feature tools-install ready
+# deptrac (architecture layer checks) is isolated in tools/deptrac for the same reason.
+DEPTRAC = $(PHP_RUN) tools/deptrac/vendor/bin/deptrac analyse --config-file=deptrac.yaml --no-progress
+
+.PHONY: phpstan cs-check cs-fix deptrac test test-unit test-feature tools-install ready
 
 phpstan: ## Run PHPStan static analysis
 	@$(PHP_RUN) vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
+deptrac: ## Check architecture layers (Domain <- Application <- Infrastructure)
+	@$(DEPTRAC)
 
 cs-check: ## Check code style without changing files
 	@$(CS_FIXER) --dry-run --diff
@@ -30,8 +36,9 @@ test-unit: ## Run only the unit test suite
 test-feature: ## Run only the feature test suite
 	@$(PHP_RUN) vendor/bin/phpunit --testsuite feature
 
-tools-install: ## Install isolated dev tools (php-cs-fixer)
+tools-install: ## Install isolated dev tools (php-cs-fixer, deptrac)
 	@$(PHP_RUN) composer install -d tools/php-cs-fixer --no-interaction
+	@$(PHP_RUN) composer install -d tools/deptrac --no-interaction
 
-ready: cs-check phpstan test ## Run every quality gate (style + static analysis + tests)
+ready: cs-check phpstan deptrac test ## Run every quality gate (style + static analysis + architecture + tests)
 	@printf "$(GREEN)✓ make ready: all quality gates passed$(RESET)\n"
