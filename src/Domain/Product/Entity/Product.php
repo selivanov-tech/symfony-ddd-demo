@@ -4,14 +4,26 @@ namespace App\Domain\Product\Entity;
 
 use App\Domain\Product\ValueObject\StateScoreMultiplier;
 use App\Domain\Product\ValueObject\StatesScoreMultiplierCollection;
-use App\Domain\Shared\Entity\Traits\SharedEntityUuidTrait;
+use App\Shared\Domain\Identity\UuidInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'products')]
 class Product
 {
-    use SharedEntityUuidTrait;
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid_binary', unique: true)]
+    private UuidInterface $id;
+
+    public function __construct(UuidInterface $id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId(): UuidInterface
+    {
+        return $this->id;
+    }
 
     #[ORM\Column(type: 'string', length: 255)]
     private string $name;

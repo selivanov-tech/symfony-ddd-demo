@@ -7,6 +7,9 @@ namespace App\Tests\Support;
 use App\Domain\Customer\Entity\Customer;
 use App\Domain\Product\Entity\Product;
 use App\Domain\Product\ValueObject\StatesScoreMultiplierCollection;
+use App\Shared\Domain\Identity\UuidFactoryInterface;
+use App\Shared\Domain\Identity\UuidInterface;
+use App\Shared\Infrastructure\Identity\SymfonyUuidFactory;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -17,12 +20,14 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 trait LendingFixtures
 {
+    private UuidFactoryInterface $uuidFactory;
+
     /**
      * @param array<string, mixed> $overrides
      */
     private function createCustomer(EntityManagerInterface $em, array $overrides = []): Customer
     {
-        $customer = (new Customer())
+        $customer = (new Customer($this->newId()))
             ->setEmail($overrides['email'] ?? 'jane.doe@example.com')
             ->setPhone($overrides['phone'] ?? '5550000001')
             ->setSsn($overrides['ssn'] ?? '123-45-6789')
@@ -49,7 +54,7 @@ trait LendingFixtures
      */
     private function createProduct(EntityManagerInterface $em, array $overrides = []): Product
     {
-        $product = (new Product())
+        $product = (new Product($this->newId()))
             ->setName($overrides['name'] ?? 'Personal Loan')
             ->setTermInMonths($overrides['termInMonths'] ?? 24)
             ->setInterestRate($overrides['interestRate'] ?? 9.5)
@@ -65,5 +70,15 @@ trait LendingFixtures
         $em->flush();
 
         return $product;
+    }
+
+    private function newId(): UuidInterface
+    {
+        return $this->uuidFactory()->uuid7();
+    }
+
+    private function uuidFactory(): UuidFactoryInterface
+    {
+        return $this->uuidFactory ??= new SymfonyUuidFactory();
     }
 }

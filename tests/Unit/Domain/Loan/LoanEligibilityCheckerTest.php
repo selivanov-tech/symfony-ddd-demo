@@ -9,16 +9,20 @@ use App\Domain\Loan\Exception\LoanApplicationDeniedException;
 use App\Domain\Loan\Service\LoanEligibilityChecker;
 use App\Domain\Product\Entity\Product;
 use App\Domain\Product\ValueObject\StatesScoreMultiplierCollection;
+use App\Shared\Domain\Identity\UuidFactoryInterface;
+use App\Shared\Infrastructure\Identity\SymfonyUuidFactory;
 use App\Tests\Support\FixedNewYorkLottery;
 use PHPUnit\Framework\TestCase;
 
 final class LoanEligibilityCheckerTest extends TestCase
 {
     private LoanEligibilityChecker $checker;
+    private UuidFactoryInterface $uuid;
 
     protected function setUp(): void
     {
         $this->checker = new LoanEligibilityChecker(new FixedNewYorkLottery(rejects: false));
+        $this->uuid = new SymfonyUuidFactory();
     }
 
     public function testEligibleApplicantPasses(): void
@@ -111,7 +115,7 @@ final class LoanEligibilityCheckerTest extends TestCase
      */
     private function customer(array $overrides = []): Customer
     {
-        return (new Customer())
+        return (new Customer($this->uuid->uuid7()))
             ->setFicoScore($overrides['ficoScore'] ?? 720)
             ->setMonthlyIncome($overrides['monthlyIncome'] ?? 6000)
             ->setBirthday($overrides['birthday'] ?? new \DateTimeImmutable('1990-01-01'))
@@ -128,7 +132,7 @@ final class LoanEligibilityCheckerTest extends TestCase
      */
     private function product(array $overrides = []): Product
     {
-        return (new Product())
+        return (new Product($this->uuid->uuid7()))
             ->setMinFICOScore($overrides['minFICOScore'] ?? 600)
             ->setMinMonthlyIncome($overrides['minMonthlyIncome'] ?? 2000)
             ->setMinAge($overrides['minAge'] ?? 18)

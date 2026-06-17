@@ -16,7 +16,7 @@ final class LoanApiTest extends DatabaseTestCase
         $customer = $this->createCustomer($this->em);
         $product = $this->createProduct($this->em);
 
-        $this->client->request('GET', $this->eligibilityUri($product->getId(), $customer->getId()));
+        $this->client->request('GET', $this->eligibilityUri((string) $product->getId(), (string) $customer->getId()));
 
         self::assertResponseIsSuccessful();
         self::assertSame(['result' => true], $this->responseJson());
@@ -27,7 +27,7 @@ final class LoanApiTest extends DatabaseTestCase
         $customer = $this->createCustomer($this->em, ['ficoScore' => 620]);
         $product = $this->createProduct($this->em, ['minFICOScore' => 800]);
 
-        $this->client->request('GET', $this->eligibilityUri($product->getId(), $customer->getId()));
+        $this->client->request('GET', $this->eligibilityUri((string) $product->getId(), (string) $customer->getId()));
 
         self::assertResponseIsSuccessful();
 

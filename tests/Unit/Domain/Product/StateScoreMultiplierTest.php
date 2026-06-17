@@ -7,11 +7,20 @@ namespace App\Tests\Unit\Domain\Product;
 use App\Domain\Product\Entity\Product;
 use App\Domain\Product\Enum\StateScoreMultiplierOperationEnum;
 use App\Domain\Product\ValueObject\StateScoreMultiplier;
+use App\Shared\Domain\Identity\UuidFactoryInterface;
+use App\Shared\Infrastructure\Identity\SymfonyUuidFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class StateScoreMultiplierTest extends TestCase
 {
+    private UuidFactoryInterface $uuid;
+
+    protected function setUp(): void
+    {
+        $this->uuid = new SymfonyUuidFactory();
+    }
+
     public function testItBuildsFromAValidRule(): void
     {
         $multiplier = new StateScoreMultiplier(['state' => 'CA', 'operation' => 'plus', 'value' => 2.5]);
@@ -23,7 +32,7 @@ final class StateScoreMultiplierTest extends TestCase
 
     public function testApplyRulePlusIncreasesTheInterestRate(): void
     {
-        $product = (new Product())->setInterestRate(10.0);
+        $product = (new Product($this->uuid->uuid7()))->setInterestRate(10.0);
 
         (new StateScoreMultiplier(['state' => 'CA', 'operation' => 'plus', 'value' => 2.5]))->applyRule($product);
 
@@ -32,7 +41,7 @@ final class StateScoreMultiplierTest extends TestCase
 
     public function testApplyRuleMinusDecreasesTheInterestRate(): void
     {
-        $product = (new Product())->setInterestRate(10.0);
+        $product = (new Product($this->uuid->uuid7()))->setInterestRate(10.0);
 
         (new StateScoreMultiplier(['state' => 'CA', 'operation' => 'minus', 'value' => 3.0]))->applyRule($product);
 

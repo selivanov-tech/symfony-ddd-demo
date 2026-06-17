@@ -13,6 +13,7 @@ use App\Domain\Loan\Repository\LoanRepositoryInterface;
 use App\Domain\Loan\Service\LoanEligibilityChecker;
 use App\Domain\Product\Repository\ProductRepositoryInterface;
 use App\Shared\Application\Bus\Event\EventBusInterface;
+use App\Shared\Domain\Identity\UuidFactoryInterface;
 use App\Shared\Domain\ValueObject\Money;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -24,6 +25,7 @@ final class ApplyForLoanHandler
         private readonly CustomerRepositoryInterface $customers,
         private readonly LoanRepositoryInterface $loans,
         private readonly LoanEligibilityChecker $checker,
+        private readonly UuidFactoryInterface $uuidFactory,
         private readonly EventBusInterface $eventBus,
     ) {
     }
@@ -36,14 +38,14 @@ final class ApplyForLoanHandler
 
         try {
             $this->checker->isEligible($product, $customer);
-            $loan = Loan::approved($customer, $product, $amount);
+            $loan = Loan::approved($this->uuidFactory, $customer, $product, $amount);
         } catch (LoanApplicationDeniedException $exception) {
-            $loan = Loan::rejected($customer, $product, $amount, $exception->getReason());
+            $loan = Loan::rejected($this->uuidFactory, $customer, $product, $amount, $exception->getReason());
         }
 
         $this->loans->save($loan);
         $this->eventBus->publish(...$loan->releaseEvents());
 
-        return new LoanDecision($loan->getId(), $loan->isApproved());
+        return new LoanDecision($loan->getId()->toString(), $loan->isApproved());
     }
 }
