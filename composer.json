@@ -32,6 +32,11 @@
             "symfony/flex": true,
             "symfony/runtime": true
         },
+        "audit": {
+            "ignore": {
+                "PKSA-5r1g-c7b7-y1zg": "dev/test only: symfony/dom-crawler is a transitive dep of symfony/browser-kit used by functional tests; not reachable in production"
+            }
+        },
         "sort-packages": true
     },
     "autoload": {
@@ -76,6 +81,10 @@
         }
     },
     "require-dev": {
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^11.5",
+        "symfony/browser-kit": "7.1.*",
+        "symfony/css-selector": "7.1.*",
         "symfony/maker-bundle": "^1.61"
     }
 }

@@ -1,5 +1,7 @@
 # Symfony DDD demo — loan eligibility service
 
+[![CI](https://github.com/selivanov-tech/symfony-ddd-demo/actions/workflows/ci.yml/badge.svg)](https://github.com/selivanov-tech/symfony-ddd-demo/actions/workflows/ci.yml)
+
 A small **Symfony 7.1** backend that shows a clean **Domain-Driven Design** layout.
 It models a simple lending flow: create customers, define loan products, and check
 whether a customer is eligible for a loan.
@@ -49,6 +51,7 @@ src/
 - Doctrine ORM 3 + migrations
 - SQLite by default (PostgreSQL-ready — see `DATABASE_URL` in `.env`)
 - Docker + Docker Compose, with `make` helpers
+- Quality: PHPUnit (unit + feature), PHPStan (level 6), PHP-CS-Fixer, GitHub Actions CI
 
 ## Run it
 
@@ -71,6 +74,42 @@ The app runs at `http://localhost:8000`.
 
 Ready-to-run request samples are in [`http/v0/`](http/v0/) (JetBrains HTTP client
 format). Run them with `make tests-http`.
+
+## Quality & CI
+
+One command runs every quality gate — code style, static analysis, and tests:
+
+```bash
+make ready
+```
+
+It runs, in order:
+
+| Gate | Command | What it checks |
+|---|---|---|
+| Code style | `make cs-check` (`make cs-fix` to apply) | PHP-CS-Fixer (`@PSR12` + safe rules) |
+| Static analysis | `make phpstan` | PHPStan level 6 |
+| Tests | `make test` (`test-unit` / `test-feature`) | PHPUnit suites |
+
+Tests are split into two suites:
+
+- **`tests/Unit/`** — fast, no container or DB (domain rules, value objects).
+- **`tests/Feature/`** — boot the kernel and hit the HTTP API against a throwaway
+  SQLite schema (customer create / validation / read).
+
+**CI** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs each gate as a
+**separate, parallel job** (`php-cs-fixer`, `phpstan`, `unit tests`, `feature tests`)
+on every push and pull request. Each job reuses the matching `make` target
+(`make <target> PHP_RUN=`), so local and CI use the same commands — `make ready` is
+just the local shortcut that runs them all in one go.
+
+A few notes on the setup:
+
+- **PHPStan baseline.** `phpstan-baseline.neon` captures pre-existing findings so the
+  build is green today while new code is held to level 6. Burn it down over time.
+- **Isolated PHP-CS-Fixer.** It lives in its own composer project under
+  `tools/php-cs-fixer/` because its `symfony/process` requirement does not fit the
+  app's Symfony 7.1 pin — this keeps the app's dependency graph clean.
 
 ## Notes
 

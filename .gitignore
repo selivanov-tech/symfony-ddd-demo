@@ -15,3 +15,18 @@ Thumbs.db
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+
+# isolated dev tools: keep composer.json/lock, ignore their installed deps
+/tools/php-cs-fixer/vendor/
+
+# phpstan cache
+/.phpunit.result.cache

@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Each quality gate is its own job, so they run in parallel and report
+# independently. fail-fast: false keeps every gate running even if another fails.
+# Each job reuses the matching Makefile target (PHP_RUN= runs it natively).
+jobs:
+  checks:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: php-cs-fixer
+            make: cs-check
+            tools: true
+          - name: phpstan
+            make: phpstan
+            tools: false
+          - name: unit tests
+            make: test-unit
+            tools: false
+          - name: feature tests
+            make: test-feature
+            tools: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: ctype, iconv, pdo_sqlite, sqlite3, mbstring, dom, xml
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install application dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Install isolated tools (php-cs-fixer)
+        if: ${{ matrix.tools }}
+        run: composer install -d tools/php-cs-fixer --no-interaction --no-progress --prefer-dist
+
+      - name: make ${{ matrix.make }}
+        run: make ${{ matrix.make }} PHP_RUN=

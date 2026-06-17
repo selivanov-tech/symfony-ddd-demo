@@ -1,0 +1,10 @@
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 6
+    paths:
+        - src
+        - tests
+    # Pre-existing issues are captured in phpstan-baseline.neon so the build stays
+    # green while new code is held to level 6. Burn the baseline down over time.
