@@ -5,7 +5,6 @@ namespace App\Infrastructure\Event\Subscriber;
 use App\Application\Event\LoanRequestProcessedEvent;
 use App\Application\Service\Loan\LoanNotificationService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Notifier\Recipient\Recipient;
 
 class LoanEventSubscriber implements EventSubscriberInterface
 {

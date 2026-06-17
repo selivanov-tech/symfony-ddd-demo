@@ -25,7 +25,7 @@ class ExceptionTransformer
         return new JsonResponse(
             data: [
                 'error' => $exception->getMessage(),
-                'details' => [/* todo */]
+                'details' => [/* todo */],
             ],
             status: $status
         );

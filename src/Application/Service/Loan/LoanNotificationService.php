@@ -24,12 +24,12 @@ class LoanNotificationService
 
         $content = match ($loan->getResult()) {
             true => sprintf(
-                "Congratulations %s! Your loan for $%.2f has been approved.",
+                'Congratulations %s! Your loan for $%.2f has been approved.',
                 $customerName,
                 $loan->getAmount(),
             ),
             false => sprintf(
-                "Dear %s, unfortunately your loan request has been denied. Please try again later.",
+                'Dear %s, unfortunately your loan request has been denied. Please try again later.',
                 $customerName
             )
         };

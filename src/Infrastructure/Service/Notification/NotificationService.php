@@ -12,7 +12,6 @@ class NotificationService
 {
     public function __construct(
         private readonly NotifierInterface $notifier,
-
         #[Assert\All(
             new Assert\Type(NotificationChannelEnum::class),
         )]
@@ -24,7 +23,7 @@ class NotificationService
     {
         $notification = new Notification(
             subject: $subject,
-            channels: array_map(fn(NotificationChannelEnum $channel): string => $channel->value, $this->channels)
+            channels: array_map(fn (NotificationChannelEnum $channel): string => $channel->value, $this->channels)
         );
 
         $notification->content($content);

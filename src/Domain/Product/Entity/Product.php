@@ -88,7 +88,7 @@ class Product
 
         return new StatesScoreMultiplierCollection(
             array_map(
-                static fn(array $rule): StateScoreMultiplier => new StateScoreMultiplier($rule),
+                static fn (array $rule): StateScoreMultiplier => new StateScoreMultiplier($rule),
                 $rules
             )
         );
