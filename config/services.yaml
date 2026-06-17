@@ -62,5 +62,7 @@ services:
     App\Shared\Application\Bus\Event\EventBusInterface: '@App\Shared\Infrastructure\Bus\Messenger\MessengerEventBus'
     App\Shared\Application\Transaction\TransactionManagerInterface: '@App\Shared\Infrastructure\Persistence\DoctrineTransactionManager'
 
+    App\Domain\Loan\Service\NewYorkLotteryInterface: '@App\Infrastructure\Service\Loan\RandomNewYorkLottery'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

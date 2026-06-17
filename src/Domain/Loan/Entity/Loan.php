@@ -1,28 +1,73 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domain\Loan\Entity;
 
 use App\Domain\Customer\Entity\Customer;
+use App\Domain\Loan\Event\LoanApproved;
+use App\Domain\Loan\Event\LoanRejected;
 use App\Domain\Product\Entity\Product;
-use App\Domain\Shared\Entity\Traits\SharedEntityUuidTrait;
 use App\Infrastructure\Persistence\Doctrine\LoanRepository;
+use App\Shared\Domain\Aggregate\AggregateRoot;
+use App\Shared\Domain\ValueObject\Money;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\UuidV7;
 
 #[ORM\Entity(repositoryClass: LoanRepository::class)]
-class Loan
+#[ORM\Table(name: 'loans')]
+class Loan extends AggregateRoot
 {
-    use SharedEntityUuidTrait;
+    #[ORM\Id]
+    #[ORM\Column]
+    private string $id;
 
-    #[ORM\ManyToOne(targetEntity: Customer::class, inversedBy: 'loans')]
+    #[ORM\ManyToOne(targetEntity: Customer::class)]
     private Customer $customer;
-    #[ORM\ManyToOne(targetEntity: Product::class, inversedBy: 'products')]
+
+    #[ORM\ManyToOne(targetEntity: Product::class)]
     private Product $product;
-    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
-    private int $amount;
+
+    #[ORM\Column(type: 'money')]
+    private Money $amount;
+
     #[ORM\Column(type: 'boolean')]
-    private bool $result;
+    private bool $approved;
+
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $rejectReason = null;
+    private ?string $rejectReason;
+
+    private function __construct(Customer $customer, Product $product, Money $amount, bool $approved, ?string $rejectReason)
+    {
+        $this->id = (string) new UuidV7();
+        $this->customer = $customer;
+        $this->product = $product;
+        $this->amount = $amount;
+        $this->approved = $approved;
+        $this->rejectReason = $rejectReason;
+    }
+
+    public static function approved(Customer $customer, Product $product, Money $amount): self
+    {
+        $loan = new self($customer, $product, $amount, true, null);
+        $loan->recordEvent(new LoanApproved($loan->id, $customer->getId(), $amount));
+
+        return $loan;
+    }
+
+    public static function rejected(Customer $customer, Product $product, Money $amount, string $reason): self
+    {
+        $loan = new self($customer, $product, $amount, false, $reason);
+        $loan->recordEvent(new LoanRejected($loan->id, $customer->getId(), $amount, $reason));
+
+        return $loan;
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
 
     public function getCustomer(): Customer
     {
@@ -34,14 +79,14 @@ class Loan
         return $this->product;
     }
 
-    public function getAmount(): int
+    public function getAmount(): Money
     {
         return $this->amount;
     }
 
-    public function getResult(): bool
+    public function isApproved(): bool
     {
-        return $this->result;
+        return $this->approved;
     }
 
     public function getRejectReason(): ?string
@@ -49,33 +94,8 @@ class Loan
         return $this->rejectReason;
     }
 
-    public function setCustomer(Customer $customer): self
+    public function getCreatedAt(): DateTimeImmutable
     {
-        $this->customer = $customer;
-        return $this;
-    }
-
-    public function setProduct(Product $product): self
-    {
-        $this->product = $product;
-        return $this;
-    }
-
-    public function setAmount(int $amount): self
-    {
-        $this->amount = $amount;
-        return $this;
-    }
-
-    public function setResult(bool $result): self
-    {
-        $this->result = $result;
-        return $this;
-    }
-
-    public function setRejectReason(?string $rejectReason): self
-    {
-        $this->rejectReason = $rejectReason;
-        return $this;
+        return (new UuidV7($this->id))->getDateTime();
     }
 }
