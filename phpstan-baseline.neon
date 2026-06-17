@@ -73,54 +73,6 @@ parameters:
 			path: src/Domain/Product/Entity/Product.php
 
 		-
-			message: '#^Class App\\Domain\\Product\\ValueObject\\StateScoreMultiplier has an uninitialized readonly property \$operation\. Assign it in the constructor\.$#'
-			identifier: property.uninitializedReadonly
-			count: 1
-			path: src/Domain/Product/ValueObject/StateScoreMultiplier.php
-
-		-
-			message: '#^Class App\\Domain\\Product\\ValueObject\\StateScoreMultiplier has an uninitialized readonly property \$state\. Assign it in the constructor\.$#'
-			identifier: property.uninitializedReadonly
-			count: 1
-			path: src/Domain/Product/ValueObject/StateScoreMultiplier.php
-
-		-
-			message: '#^Class App\\Domain\\Product\\ValueObject\\StateScoreMultiplier has an uninitialized readonly property \$value\. Assign it in the constructor\.$#'
-			identifier: property.uninitializedReadonly
-			count: 1
-			path: src/Domain/Product/ValueObject/StateScoreMultiplier.php
-
-		-
-			message: '#^Constructor of class App\\Domain\\Product\\ValueObject\\StateScoreMultiplier has an unused parameter \$ruls\.$#'
-			identifier: constructor.unusedParameter
-			count: 1
-			path: src/Domain/Product/ValueObject/StateScoreMultiplier.php
-
-		-
-			message: '#^Method App\\Domain\\Product\\ValueObject\\StateScoreMultiplier\:\:__construct\(\) has parameter \$ruls with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Domain/Product/ValueObject/StateScoreMultiplier.php
-
-		-
-			message: '#^Method App\\Domain\\Product\\ValueObject\\StateScoreMultiplier\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Domain/Product/ValueObject/StateScoreMultiplier.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: src/Domain/Product/ValueObject/StateScoreMultiplier.php
-
-		-
-			message: '#^Variable \$rule in isset\(\) is never defined\.$#'
-			identifier: isset.variable
-			count: 3
-			path: src/Domain/Product/ValueObject/StateScoreMultiplier.php
-
-		-
 			message: '#^Method App\\Domain\\Product\\ValueObject\\StatesScoreMultiplierCollection\:\:__construct\(\) has parameter \$rules with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1

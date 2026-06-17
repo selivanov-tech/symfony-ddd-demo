@@ -12,31 +12,49 @@ class StateScoreMultiplier
     public readonly StateScoreMultiplierOperationEnum $operation;
     public readonly int|float $value;
 
-    public function __construct(array $ruls)
+    /**
+     * @param array<string, mixed> $rule
+     */
+    public function __construct(array $rule)
     {
         if (!isset($rule['state'], $rule['operation'], $rule['value'])) {
             throw new InvalidArgumentException('Each rule must have "state", "operation", and "value".');
         }
 
-        $operation = StateScoreMultiplierOperationEnum::tryFrom($rule['operation']);
+        $state = $rule['state'];
+        $operationValue = $rule['operation'];
+        $value = $rule['value'];
+
+        if (!is_string($state)) {
+            throw new InvalidArgumentException('State must be a string.');
+        }
+
+        if (!is_string($operationValue)) {
+            throw new InvalidArgumentException('Operation must be a string.');
+        }
+
+        $operation = StateScoreMultiplierOperationEnum::tryFrom($operationValue);
         if ($operation === null) {
             throw new InvalidArgumentException('Invalid operation. Allowed: "plus", "minus".');
         }
 
-        if (!is_numeric($rule['value'])) {
+        if (!is_numeric($value)) {
             throw new InvalidArgumentException('Value must be numeric.');
         }
 
-        $this->state = $rule['state'];
+        $this->state = $state;
         $this->operation = $operation;
-        $this->value = $rule['value'];
+        $this->value = is_int($value) ? $value : (float) $value;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         return [
             'state' => $this->state,
-            'operation' => $this->operation,
+            'operation' => $this->operation->value,
             'value' => $this->value,
         ];
     }
@@ -48,8 +66,6 @@ class StateScoreMultiplier
         $newRate = match ($this->operation) {
             StateScoreMultiplierOperationEnum::PLUS => $interestRate + $this->value,
             StateScoreMultiplierOperationEnum::MINUS => $interestRate - $this->value,
-            //StateScoreMultiplierOperationEnum::MULTIPLY => $getInterestRate * (1 + $this->value / 100),
-            //StateScoreMultiplierOperationEnum::DIVIDE => $getInterestRate * (1 - $this->value / 100),
         };
 
         $product->setInterestRate($newRate);
