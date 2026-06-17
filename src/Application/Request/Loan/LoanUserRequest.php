@@ -10,11 +10,9 @@ class LoanUserRequest
         #[Assert\NotBlank]
         #[Assert\Uuid]
         public readonly string $productId,
-
         #[Assert\NotBlank]
         #[Assert\Uuid]
         public readonly string $customerId,
-
         #[Assert\IsTrue]
         public readonly bool $onlyCheck = false,
     ) {

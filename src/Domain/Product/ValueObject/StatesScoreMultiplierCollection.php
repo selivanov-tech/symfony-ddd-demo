@@ -20,7 +20,7 @@ class StatesScoreMultiplierCollection
         $rules = $this->rules;
 
         return array_map(
-            static fn(StateScoreMultiplier $rule) => $rule->toArray(),
+            static fn (StateScoreMultiplier $rule) => $rule->toArray(),
             $rules
         );
     }

@@ -6,7 +6,6 @@ use App\Domain\Customer\Exception\InvalidFICOScoreException;
 use App\Domain\Customer\ValueObject\Address;
 use App\Domain\Shared\Entity\Traits\SharedEntityUuidTrait;
 use App\Infrastructure\Persistence\Doctrine\CustomerRepository;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -15,27 +14,27 @@ class Customer
 {
     use SharedEntityUuidTrait;
 
-    #[ORM\Column(type: "string", length: 255, unique: true)]
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
     private string $email;
-    #[ORM\Column(type: "string", length: 10, unique: true)]
+    #[ORM\Column(type: 'string', length: 10, unique: true)]
     private string $phone;
-    #[ORM\Column(type: "string", length: 11, unique: true)]
+    #[ORM\Column(type: 'string', length: 11, unique: true)]
     private string $ssn;
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: 'string', length: 255)]
     private string $firstName;
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: 'string', length: 255)]
     private string $lastName;
-    #[ORM\Column(type: "date_immutable")]
+    #[ORM\Column(type: 'date_immutable')]
     private DateTimeImmutable $birthday;
-    #[ORM\Column(type: "integer", options: ["unsigned" => true])]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
     private int $ficoScore;
     /**
      * Address fast solution to simplify,
      * better to store it as separate tables, and make relations
      */
-    #[ORM\Column(type: "json")]
+    #[ORM\Column(type: 'json')]
     private array $address;
-    #[ORM\Column(type: "integer", options: ['unsigned' => true])]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
     private int $monthlyIncome;
 
     public function getEmail(): string

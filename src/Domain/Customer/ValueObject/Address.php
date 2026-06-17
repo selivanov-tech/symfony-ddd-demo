@@ -51,7 +51,6 @@ class Address
         return new self($data['street'], $data['city'], $data['state'], $data['zip']);
     }
 
-
     private function validateState(string $state): void
     {
         if (!in_array($state, ['CA', 'NY', 'NV', /* other states */], true)) {
