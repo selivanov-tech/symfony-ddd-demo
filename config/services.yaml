@@ -4,7 +4,6 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    app.date_format: 'Y-m-d'
     app.notification.channels:
         - !php/enum App\Application\Enum\NotificationChannelEnum::EMAIL
         - !php/enum App\Application\Enum\NotificationChannelEnum::SMS
@@ -30,19 +29,12 @@ services:
         resource: '../src/Infrastructure/Http/Controller/'
         tags: [ 'controller.service_arguments' ]
 
-    App\Infrastructure\Util\Date\DateParser:
-        arguments:
-            $format: '%app.date_format%'
-
     App\Infrastructure\Event\Subscriber\ApiEventSubscriber:
         tags: { name: kernel.event_subscriber }
 
     App\Infrastructure\Service\Notification\NotificationService:
         arguments:
             $channels: '%app.notification.channels%'
-
-    App\Infrastructure\Event\Subscriber\LoanEventSubscriber:
-        tags: { name: kernel.event_subscriber }
 
     # Bind each adapter to its own Messenger bus (autowiring would inject the default bus).
     App\Shared\Infrastructure\Bus\Messenger\MessengerCommandBus:

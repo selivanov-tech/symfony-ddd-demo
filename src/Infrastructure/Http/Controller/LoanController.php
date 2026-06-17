@@ -2,47 +2,47 @@
 
 namespace App\Infrastructure\Http\Controller;
 
+use App\Application\Loan\Command\ApplyForLoan\ApplyForLoanCommand;
+use App\Application\Loan\Command\ApplyForLoan\LoanDecision;
+use App\Application\Loan\Query\CheckEligibility\CheckLoanEligibilityQuery;
+use App\Application\Loan\ReadModel\EligibilityView;
 use App\Application\Request\Loan\LoanUserRequest;
-use App\Application\Service\Loan\LoanApplier;
+use App\Shared\Application\Bus\Command\CommandBusInterface;
+use App\Shared\Application\Bus\Query\QueryBusInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class LoanController
 {
     #[Route('loan/apply', name: 'apply for loan or check eligibility')]
     public function __invoke(
         #[MapQueryString] LoanUserRequest $loanUserRequest,
-        LoanApplier $loanApplicationService,
-        SerializerInterface $serializer
+        CommandBusInterface $commandBus,
+        QueryBusInterface $queryBus,
     ): Response {
-        $loanApplicationService->setRequest($loanUserRequest);
-
         if ($loanUserRequest->onlyCheck) {
-            $result = $loanApplicationService->isEligible();
+            $view = $queryBus->ask(new CheckLoanEligibilityQuery(
+                productId: $loanUserRequest->productId,
+                customerId: $loanUserRequest->customerId,
+            ));
+            assert($view instanceof EligibilityView);
 
-            // todo: wrap $data with new LoanEligibilityCheckResultResource($result)
-            //  (which will store OpenApi attributes)
-            $data = ['result' => $result->success];
-
-            if ($result->success === false) {
-                $data['reason'] = $result->exception->getPublicReason();
+            $data = ['result' => $view->eligible];
+            if (!$view->eligible) {
+                $data['reason'] = $view->reason;
             }
 
             return new JsonResponse($data);
         }
 
-        $result = $loanApplicationService->applyForLoan();
+        $decision = $commandBus->dispatch(new ApplyForLoanCommand(
+            productId: $loanUserRequest->productId,
+            customerId: $loanUserRequest->customerId,
+        ));
+        assert($decision instanceof LoanDecision);
 
-        // todo: wrap $data with new LoanApplyResultResource($result)
-        //   (which will store OpenApi attributes)
-        $data = [
-            'id' => $result->getId(),
-            'result' => $result->isApproved(),
-        ];
-
-        return new JsonResponse($data);
+        return new JsonResponse(['id' => $decision->loanId, 'result' => $decision->approved]);
     }
 }
