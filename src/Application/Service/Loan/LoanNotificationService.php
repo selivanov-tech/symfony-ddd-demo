@@ -22,11 +22,11 @@ class LoanNotificationService
         $customer = $loan->getCustomer();
         $customerName = $customer->getPresentedName();
 
-        $content = match ($loan->getResult()) {
+        $content = match ($loan->isApproved()) {
             true => sprintf(
                 'Congratulations %s! Your loan for $%.2f has been approved.',
                 $customerName,
-                $loan->getAmount(),
+                $loan->getAmount()->toFloat(),
             ),
             false => sprintf(
                 'Dear %s, unfortunately your loan request has been denied. Please try again later.',

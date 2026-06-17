@@ -8,6 +8,11 @@ use App\Domain\Product\Entity\Product;
 
 class LoanEligibilityChecker
 {
+    public function __construct(
+        private readonly NewYorkLotteryInterface $newYorkLottery,
+    ) {
+    }
+
     public function isEligible(Product $product, Customer $customer): bool
     {
         $minFICO = $product->getMinFICOScore();
@@ -45,7 +50,7 @@ class LoanEligibilityChecker
             );
         }
 
-        if ($state === 'NY' && random_int(0, 1) === 0) {
+        if ($state === 'NY' && $this->newYorkLottery->rejects()) {
             throw new LoanApplicationDeniedException('Random rejection for NY state.', public: false);
         }
 

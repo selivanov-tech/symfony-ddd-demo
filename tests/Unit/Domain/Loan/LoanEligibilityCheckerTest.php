@@ -9,6 +9,7 @@ use App\Domain\Loan\Exception\LoanApplicationDeniedException;
 use App\Domain\Loan\Service\LoanEligibilityChecker;
 use App\Domain\Product\Entity\Product;
 use App\Domain\Product\ValueObject\StatesScoreMultiplierCollection;
+use App\Tests\Support\FixedNewYorkLottery;
 use PHPUnit\Framework\TestCase;
 
 final class LoanEligibilityCheckerTest extends TestCase
@@ -17,13 +18,40 @@ final class LoanEligibilityCheckerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->checker = new LoanEligibilityChecker();
+        $this->checker = new LoanEligibilityChecker(new FixedNewYorkLottery(rejects: false));
     }
 
     public function testEligibleApplicantPasses(): void
     {
         self::assertTrue(
             $this->checker->isEligible($this->product(), $this->customer())
+        );
+    }
+
+    public function testNewYorkApplicantIsDeniedWhenTheLotterySelectsThem(): void
+    {
+        $checker = new LoanEligibilityChecker(new FixedNewYorkLottery(rejects: true));
+
+        try {
+            $checker->isEligible(
+                $this->product(['availableStates' => ['CA', 'NY']]),
+                $this->customer(['address' => $this->address('NY')]),
+            );
+            self::fail('Expected LoanApplicationDeniedException was not thrown.');
+        } catch (LoanApplicationDeniedException $exception) {
+            self::assertStringContainsString('Random rejection for NY state', $exception->getReason());
+        }
+    }
+
+    public function testNewYorkApplicantPassesWhenTheLotteryDoesNot(): void
+    {
+        $checker = new LoanEligibilityChecker(new FixedNewYorkLottery(rejects: false));
+
+        self::assertTrue(
+            $checker->isEligible(
+                $this->product(['availableStates' => ['CA', 'NY']]),
+                $this->customer(['address' => $this->address('NY')]),
+            )
         );
     }
 
@@ -108,5 +136,13 @@ final class LoanEligibilityCheckerTest extends TestCase
             ->setAvailableStates($overrides['availableStates'] ?? ['CA', 'NV'])
             ->setInterestRate($overrides['interestRate'] ?? 9.5)
             ->setStatesScoreMultipliers(new StatesScoreMultiplierCollection([]));
+    }
+
+    /**
+     * @return array{street: string, city: string, state: string, zip: string}
+     */
+    private function address(string $state): array
+    {
+        return ['street' => '1 Market St', 'city' => 'San Francisco', 'state' => $state, 'zip' => '94105'];
     }
 }

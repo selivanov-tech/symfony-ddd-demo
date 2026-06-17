@@ -40,7 +40,7 @@ class LoanController
         //   (which will store OpenApi attributes)
         $data = [
             'id' => $result->getId(),
-            'result' => $result->getResult(),
+            'result' => $result->isApproved(),
         ];
 
         return new JsonResponse($data);

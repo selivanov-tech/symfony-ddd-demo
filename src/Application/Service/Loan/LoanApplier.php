@@ -15,6 +15,7 @@ use App\Domain\Loan\Repository\LoanRepositoryInterface;
 use App\Domain\Loan\Service\LoanEligibilityChecker;
 use App\Domain\Product\Entity\Product;
 use App\Domain\Product\Repository\ProductRepositoryInterface;
+use App\Shared\Domain\ValueObject\Money;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 class LoanApplier
@@ -64,16 +65,11 @@ class LoanApplier
     public function applyForLoan(): Loan
     {
         $eligibilityResult = $this->isEligible();
+        $amount = Money::fromFloat($this->product->getAmount());
 
-        $loan = (new Loan())
-            ->setProduct($this->product)
-            ->setCustomer($this->customer)
-            ->setAmount($this->product->getAmount())
-            ->setResult($eligibilityResult->success);
-
-        if ($eligibilityResult->success === false) {
-            $loan->setRejectReason($eligibilityResult->exception->getReason());
-        }
+        $loan = $eligibilityResult->success
+            ? Loan::approved($this->customer, $this->product, $amount)
+            : Loan::rejected($this->customer, $this->product, $amount, (string) $eligibilityResult->exception?->getReason());
 
         $this->loanRepo->save($loan);
 
