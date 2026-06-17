@@ -25,7 +25,7 @@ final class CustomerTest extends TestCase
     {
         $customer = (new Customer($this->uuid->uuid7()))->setFicoScore(700);
 
-        self::assertSame(700, $customer->getFicoScore());
+        self::assertSame(700, $customer->getFicoScore()->value);
     }
 
     /**

@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Loan extends AggregateRoot
 {
     #[ORM\Id]
-    #[ORM\Column(type: 'uuid_binary', unique: true)]
+    #[ORM\Column(type: UuidInterface::class, unique: true)]
     private UuidInterface $id;
 
     #[ORM\ManyToOne(targetEntity: Customer::class)]
@@ -28,7 +28,7 @@ class Loan extends AggregateRoot
     #[ORM\ManyToOne(targetEntity: Product::class)]
     private Product $product;
 
-    #[ORM\Column(type: 'money')]
+    #[ORM\Column(type: Money::class)]
     private Money $amount;
 
     #[ORM\Column(type: 'boolean')]

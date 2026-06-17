@@ -44,7 +44,7 @@ final class LoanDecisionNotifier
         $this->notifications->send(
             subject: 'Loan Request Results',
             content: $this->content($loan),
-            recipient: new Recipient(email: $customer->getEmail(), phone: $customer->getPhone()),
+            recipient: new Recipient(email: (string) $customer->getEmail(), phone: (string) $customer->getPhone()),
         );
     }
 

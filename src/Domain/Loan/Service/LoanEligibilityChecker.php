@@ -16,7 +16,7 @@ class LoanEligibilityChecker
     public function isEligible(Product $product, Customer $customer): bool
     {
         $minFICO = $product->getMinFICOScore();
-        if ($customer->getFicoScore() < $minFICO) {
+        if ($customer->getFicoScore()->value < $minFICO) {
             throw new LoanApplicationDeniedException(
                 sprintf('Credit score too low, it should be at least %d.', $minFICO)
             );

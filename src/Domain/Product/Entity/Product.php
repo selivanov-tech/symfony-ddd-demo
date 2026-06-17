@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Product
 {
     #[ORM\Id]
-    #[ORM\Column(type: 'uuid_binary', unique: true)]
+    #[ORM\Column(type: UuidInterface::class, unique: true)]
     private UuidInterface $id;
 
     public function __construct(UuidInterface $id)
