@@ -8,14 +8,13 @@ use App\Domain\Customer\Entity\Customer;
 use App\Domain\Loan\Event\LoanApproved;
 use App\Domain\Loan\Event\LoanRejected;
 use App\Domain\Product\Entity\Product;
-use App\Infrastructure\Persistence\Doctrine\LoanRepository;
 use App\Shared\Domain\Aggregate\AggregateRoot;
 use App\Shared\Domain\ValueObject\Money;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\UuidV7;
 
-#[ORM\Entity(repositoryClass: LoanRepository::class)]
+#[ORM\Entity]
 #[ORM\Table(name: 'loans')]
 class Loan extends AggregateRoot
 {

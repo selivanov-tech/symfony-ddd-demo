@@ -1,0 +1,29 @@
+deptrac:
+  paths:
+    - ./src
+  layers:
+    - name: Domain
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\.*'
+        - type: classLike
+          value: '^App\\Shared\\Domain\\.*'
+    - name: Application
+      collectors:
+        - type: classLike
+          value: '^App\\Application\\.*'
+        - type: classLike
+          value: '^App\\Shared\\Application\\.*'
+    - name: Infrastructure
+      collectors:
+        - type: classLike
+          value: '^App\\Infrastructure\\.*'
+        - type: classLike
+          value: '^App\\Shared\\Infrastructure\\.*'
+  ruleset:
+    Domain: ~
+    Application:
+      - Domain
+    Infrastructure:
+      - Application
+      - Domain

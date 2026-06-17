@@ -56,5 +56,7 @@ services:
 
     App\Domain\Loan\Service\NewYorkLotteryInterface: '@App\Infrastructure\Service\Loan\RandomNewYorkLottery'
 
+    App\Application\Notification\NotificationSenderInterface: '@App\Infrastructure\Service\Notification\NotificationService'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

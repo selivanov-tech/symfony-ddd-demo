@@ -27,6 +27,8 @@ Thumbs.db
 
 # isolated dev tools: keep composer.json/lock, ignore their installed deps
 /tools/php-cs-fixer/vendor/
+/tools/deptrac/vendor/
+/.deptrac.cache
 
 # phpstan cache
 /.phpunit.result.cache

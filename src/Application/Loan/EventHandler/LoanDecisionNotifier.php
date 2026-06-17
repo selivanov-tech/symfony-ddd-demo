@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Application\Loan\EventHandler;
 
+use App\Application\Notification\NotificationSenderInterface;
 use App\Domain\Loan\Entity\Loan;
 use App\Domain\Loan\Event\LoanApproved;
 use App\Domain\Loan\Event\LoanRejected;
 use App\Domain\Loan\Repository\LoanRepositoryInterface;
-use App\Infrastructure\Service\Notification\NotificationService;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Notifier\Recipient\Recipient;
 
@@ -16,7 +16,7 @@ final class LoanDecisionNotifier
 {
     public function __construct(
         private readonly LoanRepositoryInterface $loans,
-        private readonly NotificationService $notifications,
+        private readonly NotificationSenderInterface $notifications,
     ) {
     }
 

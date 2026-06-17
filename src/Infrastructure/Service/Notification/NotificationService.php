@@ -3,12 +3,13 @@
 namespace App\Infrastructure\Service\Notification;
 
 use App\Application\Enum\NotificationChannelEnum;
+use App\Application\Notification\NotificationSenderInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\Recipient\Recipient;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class NotificationService
+class NotificationService implements NotificationSenderInterface
 {
     public function __construct(
         private readonly NotifierInterface $notifier,

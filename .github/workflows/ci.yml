@@ -18,16 +18,16 @@ jobs:
         include:
           - name: php-cs-fixer
             make: cs-check
-            tools: true
+            tool: php-cs-fixer
           - name: phpstan
             make: phpstan
-            tools: false
+          - name: deptrac
+            make: deptrac
+            tool: deptrac
           - name: unit tests
             make: test-unit
-            tools: false
           - name: feature tests
             make: test-feature
-            tools: false
 
     steps:
       - uses: actions/checkout@v4
@@ -50,9 +50,9 @@ jobs:
       - name: Install application dependencies
         run: composer install --no-interaction --no-progress --prefer-dist
 
-      - name: Install isolated tools (php-cs-fixer)
-        if: ${{ matrix.tools }}
-        run: composer install -d tools/php-cs-fixer --no-interaction --no-progress --prefer-dist
+      - name: Install isolated tool
+        if: ${{ matrix.tool }}
+        run: composer install -d tools/${{ matrix.tool }} --no-interaction --no-progress --prefer-dist
 
       - name: make ${{ matrix.make }}
         run: make ${{ matrix.make }} PHP_RUN=

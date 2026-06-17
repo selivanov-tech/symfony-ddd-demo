@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Application\Loan;
 
 use App\Application\Loan\EventHandler\LoanDecisionNotifier;
+use App\Application\Notification\NotificationSenderInterface;
 use App\Domain\Customer\Entity\Customer;
 use App\Domain\Loan\Entity\Loan;
 use App\Domain\Loan\Event\LoanApproved;
 use App\Domain\Loan\Repository\LoanRepositoryInterface;
 use App\Domain\Product\Entity\Product;
-use App\Infrastructure\Service\Notification\NotificationService;
 use App\Shared\Domain\ValueObject\Money;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -25,7 +25,7 @@ final class LoanDecisionNotifierTest extends TestCase
         $loans = $this->createMock(LoanRepositoryInterface::class);
         $loans->method('findById')->with($loan->getId())->willReturn($loan);
 
-        $notifications = $this->createMock(NotificationService::class);
+        $notifications = $this->createMock(NotificationSenderInterface::class);
         $notifications->expects(self::once())
             ->method('send')
             ->with(
@@ -43,7 +43,7 @@ final class LoanDecisionNotifierTest extends TestCase
         $loans = $this->createMock(LoanRepositoryInterface::class);
         $loans->method('findById')->willReturn(null);
 
-        $notifications = $this->createMock(NotificationService::class);
+        $notifications = $this->createMock(NotificationSenderInterface::class);
         $notifications->expects(self::never())->method('send');
 
         $notifier = new LoanDecisionNotifier($loans, $notifications);

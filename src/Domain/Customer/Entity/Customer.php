@@ -5,11 +5,10 @@ namespace App\Domain\Customer\Entity;
 use App\Domain\Customer\Exception\InvalidFICOScoreException;
 use App\Domain\Customer\ValueObject\Address;
 use App\Domain\Shared\Entity\Traits\SharedEntityUuidTrait;
-use App\Infrastructure\Persistence\Doctrine\CustomerRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: CustomerRepository::class)]
+#[ORM\Entity]
 class Customer
 {
     use SharedEntityUuidTrait;
