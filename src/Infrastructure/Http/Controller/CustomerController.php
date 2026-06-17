@@ -61,8 +61,8 @@ class CustomerController
         $data = $serializer->serialize(
             data: $customer,
             format: 'json',
-        // todo: implement auth and ACL
-//            context: ['groups' => ['customer:read']]
+            // todo: implement auth and ACL
+            //            context: ['groups' => ['customer:read']]
         );
 
         return JsonResponse::fromJsonString($data);
@@ -79,8 +79,8 @@ class CustomerController
         $data = $serializer->serialize(
             data: $customerGetter->getCustomerById($id),
             format: 'json',
-        // todo: implement auth and ACL
-//            context: ['groups' => ['customer:read']]
+            // todo: implement auth and ACL
+            //            context: ['groups' => ['customer:read']]
         );
 
         return JsonResponse::fromJsonString($data);
