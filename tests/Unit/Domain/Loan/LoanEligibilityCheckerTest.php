@@ -8,27 +8,24 @@ use App\Domain\Customer\Entity\Customer;
 use App\Domain\Loan\Exception\LoanApplicationDeniedException;
 use App\Domain\Loan\Service\LoanEligibilityChecker;
 use App\Domain\Product\Entity\Product;
-use App\Domain\Product\ValueObject\StatesScoreMultiplierCollection;
-use App\Shared\Domain\Identity\UuidFactoryInterface;
-use App\Shared\Infrastructure\Identity\SymfonyUuidFactory;
+use App\Tests\Builder\CustomerBuilder;
+use App\Tests\Builder\ProductBuilder;
 use App\Tests\Support\FixedNewYorkLottery;
 use PHPUnit\Framework\TestCase;
 
 final class LoanEligibilityCheckerTest extends TestCase
 {
     private LoanEligibilityChecker $checker;
-    private UuidFactoryInterface $uuid;
 
     protected function setUp(): void
     {
         $this->checker = new LoanEligibilityChecker(new FixedNewYorkLottery(rejects: false));
-        $this->uuid = new SymfonyUuidFactory();
     }
 
     public function testEligibleApplicantPasses(): void
     {
         self::assertTrue(
-            $this->checker->isEligible($this->product(), $this->customer())
+            $this->checker->isEligible((new ProductBuilder())->build(), (new CustomerBuilder())->build())
         );
     }
 
@@ -38,8 +35,8 @@ final class LoanEligibilityCheckerTest extends TestCase
 
         try {
             $checker->isEligible(
-                $this->product(['availableStates' => ['CA', 'NY']]),
-                $this->customer(['address' => $this->address('NY')]),
+                (new ProductBuilder())->withAvailableStates(['CA', 'NY'])->build(),
+                (new CustomerBuilder())->withAddress($this->address('NY'))->build(),
             );
             self::fail('Expected LoanApplicationDeniedException was not thrown.');
         } catch (LoanApplicationDeniedException $exception) {
@@ -53,8 +50,8 @@ final class LoanEligibilityCheckerTest extends TestCase
 
         self::assertTrue(
             $checker->isEligible(
-                $this->product(['availableStates' => ['CA', 'NY']]),
-                $this->customer(['address' => $this->address('NY')]),
+                (new ProductBuilder())->withAvailableStates(['CA', 'NY'])->build(),
+                (new CustomerBuilder())->withAddress($this->address('NY'))->build(),
             )
         );
     }
@@ -62,8 +59,8 @@ final class LoanEligibilityCheckerTest extends TestCase
     public function testTooLowFicoIsDenied(): void
     {
         $reason = $this->denialReason(
-            $this->product(['minFICOScore' => 800]),
-            $this->customer(['ficoScore' => 700]),
+            (new ProductBuilder())->withMinFICOScore(800)->build(),
+            (new CustomerBuilder())->withFicoScore(700)->build(),
         );
 
         self::assertStringContainsString('Credit score too low', $reason);
@@ -72,8 +69,8 @@ final class LoanEligibilityCheckerTest extends TestCase
     public function testTooLowIncomeIsDenied(): void
     {
         $reason = $this->denialReason(
-            $this->product(['minMonthlyIncome' => 10000]),
-            $this->customer(['monthlyIncome' => 3000]),
+            (new ProductBuilder())->withMinMonthlyIncome(10000)->build(),
+            (new CustomerBuilder())->withMonthlyIncome(3000)->build(),
         );
 
         self::assertStringContainsString('Monthly income too low', $reason);
@@ -82,8 +79,8 @@ final class LoanEligibilityCheckerTest extends TestCase
     public function testAgeOutsideRangeIsDenied(): void
     {
         $reason = $this->denialReason(
-            $this->product(['minAge' => 18, 'maxAge' => 25]),
-            $this->customer(['birthday' => new \DateTimeImmutable('1980-01-01')]),
+            (new ProductBuilder())->withMinAge(18)->withMaxAge(25)->build(),
+            (new CustomerBuilder())->withBirthday(new \DateTimeImmutable('1980-01-01'))->build(),
         );
 
         self::assertStringContainsString('Age not eligible', $reason);
@@ -92,8 +89,8 @@ final class LoanEligibilityCheckerTest extends TestCase
     public function testUnavailableStateIsDenied(): void
     {
         $reason = $this->denialReason(
-            $this->product(['availableStates' => ['NV']]),
-            $this->customer(),
+            (new ProductBuilder())->withAvailableStates(['NV'])->build(),
+            (new CustomerBuilder())->build(),
         );
 
         self::assertStringContainsString('State not eligible', $reason);
@@ -108,38 +105,6 @@ final class LoanEligibilityCheckerTest extends TestCase
         }
 
         self::fail('Expected LoanApplicationDeniedException was not thrown.');
-    }
-
-    /**
-     * @param array<string, mixed> $overrides
-     */
-    private function customer(array $overrides = []): Customer
-    {
-        return (new Customer($this->uuid->uuid7()))
-            ->setFicoScore($overrides['ficoScore'] ?? 720)
-            ->setMonthlyIncome($overrides['monthlyIncome'] ?? 6000)
-            ->setBirthday($overrides['birthday'] ?? new \DateTimeImmutable('1990-01-01'))
-            ->setAddress($overrides['address'] ?? [
-                'street' => '1 Market St',
-                'city' => 'San Francisco',
-                'state' => 'CA',
-                'zip' => '94105',
-            ]);
-    }
-
-    /**
-     * @param array<string, mixed> $overrides
-     */
-    private function product(array $overrides = []): Product
-    {
-        return (new Product($this->uuid->uuid7()))
-            ->setMinFICOScore($overrides['minFICOScore'] ?? 600)
-            ->setMinMonthlyIncome($overrides['minMonthlyIncome'] ?? 2000)
-            ->setMinAge($overrides['minAge'] ?? 18)
-            ->setMaxAge($overrides['maxAge'] ?? 70)
-            ->setAvailableStates($overrides['availableStates'] ?? ['CA', 'NV'])
-            ->setInterestRate($overrides['interestRate'] ?? 9.5)
-            ->setStatesScoreMultipliers(new StatesScoreMultiplierCollection([]));
     }
 
     /**

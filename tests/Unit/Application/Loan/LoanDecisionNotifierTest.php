@@ -10,10 +10,11 @@ use App\Domain\Customer\Entity\Customer;
 use App\Domain\Loan\Entity\Loan;
 use App\Domain\Loan\Event\LoanApproved;
 use App\Domain\Loan\Repository\LoanRepositoryInterface;
-use App\Domain\Product\Entity\Product;
 use App\Shared\Domain\Identity\UuidFactoryInterface;
 use App\Shared\Domain\ValueObject\Money;
 use App\Shared\Infrastructure\Identity\SymfonyUuidFactory;
+use App\Tests\Builder\CustomerBuilder;
+use App\Tests\Builder\ProductBuilder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Recipient\Recipient;
 
@@ -28,7 +29,7 @@ final class LoanDecisionNotifierTest extends TestCase
 
     public function testItNotifiesTheCustomerWhenALoanIsApproved(): void
     {
-        $loan = Loan::approved($this->uuid, $this->customer(), new Product($this->uuid->uuid7()), new Money(500000));
+        $loan = Loan::approved($this->uuid, $this->customer(), (new ProductBuilder($this->uuid))->build(), new Money(500000));
 
         $loans = $this->createMock(LoanRepositoryInterface::class);
         $loans->method('findById')->with($loan->getId()->toString())->willReturn($loan);
@@ -60,15 +61,6 @@ final class LoanDecisionNotifierTest extends TestCase
 
     private function customer(): Customer
     {
-        return (new Customer($this->uuid->uuid7()))
-            ->setEmail('jane.doe@example.com')
-            ->setPhone('5550000001')
-            ->setSsn('123-45-6789')
-            ->setFirstName('Jane')
-            ->setLastName('Doe')
-            ->setBirthday(new \DateTimeImmutable('1990-01-01'))
-            ->setFicoScore(720)
-            ->setAddress(['street' => '1 Market St', 'city' => 'San Francisco', 'state' => 'CA', 'zip' => '94105'])
-            ->setMonthlyIncome(6000);
+        return (new CustomerBuilder($this->uuid))->build();
     }
 }

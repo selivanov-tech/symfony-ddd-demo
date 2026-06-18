@@ -14,9 +14,10 @@ use App\Domain\Loan\Repository\LoanRepositoryInterface;
 use App\Domain\Loan\Service\LoanEligibilityChecker;
 use App\Domain\Product\Entity\Product;
 use App\Domain\Product\Repository\ProductRepositoryInterface;
-use App\Domain\Product\ValueObject\StatesScoreMultiplierCollection;
 use App\Shared\Domain\Identity\UuidFactoryInterface;
 use App\Shared\Infrastructure\Identity\SymfonyUuidFactory;
+use App\Tests\Builder\CustomerBuilder;
+use App\Tests\Builder\ProductBuilder;
 use App\Tests\Support\FixedNewYorkLottery;
 use App\Tests\Support\SpyEventBus;
 use PHPUnit\Framework\TestCase;
@@ -53,8 +54,8 @@ final class ApplyForLoanHandlerTest extends TestCase
     {
         $spy = new SpyEventBus();
         $handler = $this->handler(
-            $this->customer(['ficoScore' => 500]),
-            $this->product(['minFICOScore' => 800]),
+            $this->customer(ficoScore: 500),
+            $this->product(minFicoScore: 800),
             $spy,
         );
 
@@ -87,38 +88,13 @@ final class ApplyForLoanHandlerTest extends TestCase
         );
     }
 
-    /**
-     * @param array<string, mixed> $overrides
-     */
-    private function customer(array $overrides = []): Customer
+    private function customer(int $ficoScore = 720): Customer
     {
-        return (new Customer($this->uuid->uuid7()))
-            ->setEmail('jane.doe@example.com')
-            ->setPhone('5550000001')
-            ->setSsn('123-45-6789')
-            ->setFirstName('Jane')
-            ->setLastName('Doe')
-            ->setBirthday(new \DateTimeImmutable('1990-01-01'))
-            ->setFicoScore($overrides['ficoScore'] ?? 720)
-            ->setAddress(['street' => '1 Market St', 'city' => 'San Francisco', 'state' => 'CA', 'zip' => '94105'])
-            ->setMonthlyIncome(6000);
+        return (new CustomerBuilder($this->uuid))->withFicoScore($ficoScore)->build();
     }
 
-    /**
-     * @param array<string, mixed> $overrides
-     */
-    private function product(array $overrides = []): Product
+    private function product(int $minFicoScore = 600): Product
     {
-        return (new Product($this->uuid->uuid7()))
-            ->setName('Personal Loan')
-            ->setTermInMonths(24)
-            ->setInterestRate(9.5)
-            ->setAmount(10000.0)
-            ->setMinFICOScore($overrides['minFICOScore'] ?? 600)
-            ->setMinMonthlyIncome(2000)
-            ->setMinAge(18)
-            ->setMaxAge(70)
-            ->setAvailableStates(['CA', 'NV'])
-            ->setStatesScoreMultipliers(new StatesScoreMultiplierCollection([]));
+        return (new ProductBuilder($this->uuid))->withMinFICOScore($minFicoScore)->build();
     }
 }

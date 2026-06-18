@@ -24,8 +24,8 @@ final class LoanApiTest extends DatabaseTestCase
 
     public function testIneligibleApplicantIsRejectedWithAReason(): void
     {
-        $customer = $this->createCustomer($this->em, ['ficoScore' => 620]);
-        $product = $this->createProduct($this->em, ['minFICOScore' => 800]);
+        $customer = $this->createCustomer($this->em, $this->customerBuilder()->withFicoScore(620));
+        $product = $this->createProduct($this->em, $this->productBuilder()->withMinFICOScore(800));
 
         $this->client->request('GET', $this->eligibilityUri((string) $product->getId(), (string) $customer->getId()));
 
