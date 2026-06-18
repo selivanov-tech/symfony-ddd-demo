@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Domain\Product;
 
-use App\Domain\Product\Enum\StateScoreMultiplierOperationEnum;
-use App\Domain\Product\ValueObject\StateScoreMultiplier;
+use App\Module\Product\Domain\Enum\StateScoreMultiplierOperationEnum;
+use App\Module\Product\Domain\ValueObject\StateScoreMultiplier;
 use App\Tests\Builder\ProductBuilder;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

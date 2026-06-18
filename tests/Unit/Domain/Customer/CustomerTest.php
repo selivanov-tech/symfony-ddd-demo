@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Domain\Customer;
 
-use App\Domain\Customer\Exception\InvalidFICOScoreException;
-use App\Domain\Customer\ValueObject\Address;
+use App\Module\Customer\Domain\Exception\InvalidFICOScoreException;
+use App\Module\Customer\Domain\ValueObject\Address;
 use App\Tests\Builder\CustomerBuilder;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

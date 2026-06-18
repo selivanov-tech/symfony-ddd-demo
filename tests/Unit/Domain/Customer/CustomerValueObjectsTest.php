@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Domain\Customer;
 
-use App\Domain\Customer\Exception\InvalidFICOScoreException;
-use App\Domain\Customer\ValueObject\Email;
-use App\Domain\Customer\ValueObject\FicoScore;
-use App\Domain\Customer\ValueObject\Phone;
-use App\Domain\Customer\ValueObject\Ssn;
+use App\Module\Customer\Domain\Exception\InvalidFICOScoreException;
+use App\Module\Customer\Domain\ValueObject\Email;
+use App\Module\Customer\Domain\ValueObject\FicoScore;
+use App\Module\Customer\Domain\ValueObject\Phone;
+use App\Module\Customer\Domain\ValueObject\Ssn;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

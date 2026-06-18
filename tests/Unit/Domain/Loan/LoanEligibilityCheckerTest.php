@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Domain\Loan;
 
-use App\Domain\Customer\Entity\Customer;
-use App\Domain\Loan\Exception\LoanApplicationDeniedException;
-use App\Domain\Loan\Service\LoanEligibilityChecker;
-use App\Domain\Product\Entity\Product;
+use App\Module\Customer\Domain\Entity\Customer;
+use App\Module\Loan\Domain\Exception\LoanApplicationDeniedException;
+use App\Module\Loan\Domain\Service\LoanEligibilityChecker;
+use App\Module\Product\Domain\Entity\Product;
 use App\Tests\Builder\CustomerBuilder;
 use App\Tests\Builder\ProductBuilder;
 use App\Tests\Support\FixedNewYorkLottery;

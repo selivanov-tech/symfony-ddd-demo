@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Support;
 
-use App\Domain\Customer\Entity\Customer;
-use App\Domain\Product\Entity\Product;
+use App\Module\Customer\Domain\Entity\Customer;
+use App\Module\Product\Domain\Entity\Product;
 use App\Shared\Domain\Identity\UuidFactoryInterface;
 use App\Shared\Infrastructure\Identity\SymfonyUuidFactory;
 use App\Tests\Builder\CustomerBuilder;

@@ -10,16 +10,21 @@ PHP_RUN ?= docker compose run --rm -T php
 # symfony/process ^7.2 requirement does not clash with the app's symfony 7.1 pin.
 CS_FIXER = $(PHP_RUN) tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php
 
-# deptrac (architecture layer checks) is isolated in tools/deptrac for the same reason.
-DEPTRAC = $(PHP_RUN) tools/deptrac/vendor/bin/deptrac analyse --config-file=deptrac.yaml --no-progress
+# deptrac (architecture checks) is isolated in tools/deptrac for the same reason.
+# One layer config + one boundary config per module (see deptrac/). The -c flag
+# must precede --no-progress or deptrac falls back to the default depfile.
+DEPTRAC = $(PHP_RUN) tools/deptrac/vendor/bin/deptrac analyse -c
 
 .PHONY: phpstan cs-check cs-fix deptrac test test-unit test-feature tools-install ready
 
 phpstan: ## Run PHPStan static analysis
 	@$(PHP_RUN) vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 
-deptrac: ## Check architecture layers (Domain <- Application <- Infrastructure)
-	@$(DEPTRAC)
+deptrac: ## Check architecture: layer rules + per-module boundaries
+	@$(DEPTRAC) deptrac/layers.yaml --no-progress
+	@$(DEPTRAC) deptrac/module-customer.yaml --no-progress
+	@$(DEPTRAC) deptrac/module-product.yaml --no-progress
+	@$(DEPTRAC) deptrac/module-loan.yaml --no-progress
 
 cs-check: ## Check code style without changing files
 	@$(CS_FIXER) --dry-run --diff

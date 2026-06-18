@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Domain\Loan;
 
-use App\Domain\Customer\Entity\Customer;
-use App\Domain\Loan\Entity\Loan;
-use App\Domain\Loan\Event\LoanApproved;
-use App\Domain\Loan\Event\LoanRejected;
-use App\Domain\Product\Entity\Product;
+use App\Module\Customer\Domain\Entity\Customer;
+use App\Module\Loan\Domain\Entity\Loan;
+use App\Module\Loan\Domain\Event\LoanApproved;
+use App\Module\Loan\Domain\Event\LoanRejected;
+use App\Module\Product\Domain\Entity\Product;
 use App\Shared\Domain\Identity\UuidFactoryInterface;
 use App\Shared\Domain\ValueObject\Money;
 use App\Shared\Infrastructure\Identity\SymfonyUuidFactory;

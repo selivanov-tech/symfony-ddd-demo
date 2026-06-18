@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Domain\Product;
 
-use App\Domain\Product\ValueObject\StatesScoreMultiplierCollection;
+use App\Module\Product\Domain\ValueObject\StatesScoreMultiplierCollection;
 use PHPUnit\Framework\TestCase;
 
 final class StatesScoreMultiplierCollectionTest extends TestCase

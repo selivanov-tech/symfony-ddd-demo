@@ -1,0 +1,56 @@
+# Module boundary for Customer. A module's Domain/Application may depend only on
+# itself + the shared kernel, never on another module. Infrastructure is left
+# uncollected on purpose: cross-module integration is allowed there only.
+deptrac:
+  paths:
+    - ../src
+  layers:
+    - name: Application
+      collectors:
+        - type: classLike
+          value: '^App\\Module\\Customer\\Application\\.*'
+    - name: Domain
+      collectors:
+        - type: classLike
+          value: '^App\\Module\\Customer\\Domain\\.*'
+    - name: ExternalApplication
+      collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: '^App\\Module\\[^\\]+\\Application\\.*'
+          must_not:
+            - type: classLike
+              value: '^App\\Module\\Customer\\Application\\.*'
+    - name: ExternalDomain
+      collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: '^App\\Module\\[^\\]+\\Domain\\.*'
+          must_not:
+            - type: classLike
+              value: '^App\\Module\\Customer\\Domain\\.*'
+    - name: SharedKernel
+      collectors:
+        - type: classLike
+          value: '^App\\Shared\\.*'
+  ruleset:
+    Application:
+      - Domain
+      - SharedKernel
+    Domain:
+      - SharedKernel
+    SharedKernel:
+      - ExternalApplication
+      - ExternalDomain
+    ExternalApplication:
+      - Application
+      - Domain
+      - ExternalDomain
+      - SharedKernel
+    ExternalDomain:
+      - Application
+      - Domain
+      - ExternalApplication
+      - SharedKernel

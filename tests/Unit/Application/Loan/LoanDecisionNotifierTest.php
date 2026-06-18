@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Loan;
 
-use App\Application\Loan\EventHandler\LoanDecisionNotifier;
-use App\Application\Notification\NotificationSenderInterface;
-use App\Domain\Customer\Entity\Customer;
-use App\Domain\Loan\Entity\Loan;
-use App\Domain\Loan\Event\LoanApproved;
-use App\Domain\Loan\Repository\LoanRepositoryInterface;
+use App\Module\Customer\Domain\Entity\Customer;
+use App\Module\Loan\Application\EventHandler\LoanDecisionNotifier;
+use App\Module\Loan\Domain\Entity\Loan;
+use App\Module\Loan\Domain\Event\LoanApproved;
+use App\Module\Loan\Domain\Repository\LoanRepositoryInterface;
+use App\Shared\Application\Notification\NotificationSenderInterface;
 use App\Shared\Domain\Identity\UuidFactoryInterface;
 use App\Shared\Domain\ValueObject\Money;
 use App\Shared\Infrastructure\Identity\SymfonyUuidFactory;

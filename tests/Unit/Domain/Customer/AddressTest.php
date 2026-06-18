@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Domain\Customer;
 
-use App\Domain\Customer\ValueObject\Address;
+use App\Module\Customer\Domain\ValueObject\Address;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Exception\ValidatorException;
 

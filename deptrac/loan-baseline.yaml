@@ -1,0 +1,18 @@
+deptrac:
+  skip_violations:
+    App\Module\Loan\Application\Command\ApplyForLoan\ApplyForLoanHandler:
+      - App\Module\Customer\Application\Exception\CustomerNotFoundException
+      - App\Module\Customer\Domain\Repository\CustomerRepositoryInterface
+      - App\Module\Product\Application\Exception\ProductNotFoundException
+      - App\Module\Product\Domain\Repository\ProductRepositoryInterface
+    App\Module\Loan\Application\Query\CheckEligibility\CheckLoanEligibilityHandler:
+      - App\Module\Customer\Application\Exception\CustomerNotFoundException
+      - App\Module\Customer\Domain\Repository\CustomerRepositoryInterface
+      - App\Module\Product\Application\Exception\ProductNotFoundException
+      - App\Module\Product\Domain\Repository\ProductRepositoryInterface
+    App\Module\Loan\Domain\Entity\Loan:
+      - App\Module\Customer\Domain\Entity\Customer
+      - App\Module\Product\Domain\Entity\Product
+    App\Module\Loan\Domain\Service\LoanEligibilityChecker:
+      - App\Module\Customer\Domain\Entity\Customer
+      - App\Module\Product\Domain\Entity\Product

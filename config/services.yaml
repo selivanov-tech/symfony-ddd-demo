@@ -5,8 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     app.notification.channels:
-        - !php/enum App\Application\Enum\NotificationChannelEnum::EMAIL
-        - !php/enum App\Application\Enum\NotificationChannelEnum::SMS
+        - !php/enum App\Shared\Application\Notification\NotificationChannelEnum::EMAIL
+        - !php/enum App\Shared\Application\Notification\NotificationChannelEnum::SMS
 
 services:
     # default configuration for services in *this* file
@@ -14,25 +14,35 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
+    # Domain modules + shared kernel. One service per class (id = FQCN).
     App\:
         resource: '../src/'
         exclude:
-            - '../src/Infrastructure/Kernel.php'
+            - '../src/Kernel.php'
             - '../src/**/Entity/'
             - '../src/**/ValueObject/'
-            - '../src/**/Repository/'
+            - '../src/Module/*/Domain/Repository/'
             - '../src/**/DependencyInjection/'
 
-    App\Infrastructure\Http\Controller\:
-        resource: '../src/Infrastructure/Http/Controller/'
+    # Presentation — API app (listeners, response shaping, controllers).
+    Api\:
+        resource: '../apps/api/src/'
+
+    # Controllers are plain classes (no AbstractController base), so they need the
+    # controller.service_arguments tag explicitly to get their action arguments injected.
+    Api\Controller\:
+        resource: '../apps/api/src/Controller/'
         tags: [ 'controller.service_arguments' ]
 
-    App\Infrastructure\Event\Subscriber\ApiEventSubscriber:
-        tags: { name: kernel.event_subscriber }
+    Api\Module\:
+        resource: '../apps/api/src/Module/'
+        tags: [ 'controller.service_arguments' ]
 
-    App\Infrastructure\Service\Notification\NotificationService:
+    # Presentation — CLI app (console commands).
+    Cli\:
+        resource: '../apps/cli/src/'
+
+    App\Shared\Infrastructure\Notification\NotificationService:
         arguments:
             $channels: '%app.notification.channels%'
 
@@ -54,11 +64,16 @@ services:
     App\Shared\Application\Bus\Event\EventBusInterface: '@App\Shared\Infrastructure\Bus\Messenger\MessengerEventBus'
     App\Shared\Application\Transaction\TransactionManagerInterface: '@App\Shared\Infrastructure\Persistence\DoctrineTransactionManager'
 
-    App\Domain\Loan\Service\NewYorkLotteryInterface: '@App\Infrastructure\Service\Loan\RandomNewYorkLottery'
-
-    App\Application\Notification\NotificationSenderInterface: '@App\Infrastructure\Service\Notification\NotificationService'
-
     App\Shared\Domain\Identity\UuidFactoryInterface: '@App\Shared\Infrastructure\Identity\SymfonyUuidFactory'
+
+    # Module ports — domain interface bound to its infrastructure adapter.
+    App\Module\Loan\Domain\Service\NewYorkLotteryInterface: '@App\Module\Loan\Infrastructure\Service\RandomNewYorkLottery'
+    App\Shared\Application\Notification\NotificationSenderInterface: '@App\Shared\Infrastructure\Notification\NotificationService'
+
+    # Repository interfaces (Domain) bound to their Doctrine implementations (Infrastructure).
+    App\Module\Customer\Domain\Repository\CustomerRepositoryInterface: '@App\Module\Customer\Infrastructure\Repository\CustomerRepository'
+    App\Module\Loan\Domain\Repository\LoanRepositoryInterface: '@App\Module\Loan\Infrastructure\Repository\LoanRepository'
+    App\Module\Product\Domain\Repository\ProductRepositoryInterface: '@App\Module\Product\Infrastructure\Repository\ProductRepository'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

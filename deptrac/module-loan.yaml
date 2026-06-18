@@ -1,0 +1,64 @@
+# Module boundary for Loan. A module's Domain/Application may depend only on
+# itself + the shared kernel, never on another module. Infrastructure is left
+# uncollected on purpose: cross-module integration is allowed there only.
+#
+# Loan currently reads Customer + Product from its Domain/Application (the loan
+# eligibility flow consumes their entities and repository interfaces directly).
+# Those known crossings are recorded in loan-baseline.yaml as tracked debt; the
+# anti-corruption-layer refactor that moves them behind Loan-owned ports is a
+# planned follow-up.
+imports:
+  - loan-baseline.yaml
+deptrac:
+  paths:
+    - ../src
+  layers:
+    - name: Application
+      collectors:
+        - type: classLike
+          value: '^App\\Module\\Loan\\Application\\.*'
+    - name: Domain
+      collectors:
+        - type: classLike
+          value: '^App\\Module\\Loan\\Domain\\.*'
+    - name: ExternalApplication
+      collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: '^App\\Module\\[^\\]+\\Application\\.*'
+          must_not:
+            - type: classLike
+              value: '^App\\Module\\Loan\\Application\\.*'
+    - name: ExternalDomain
+      collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: '^App\\Module\\[^\\]+\\Domain\\.*'
+          must_not:
+            - type: classLike
+              value: '^App\\Module\\Loan\\Domain\\.*'
+    - name: SharedKernel
+      collectors:
+        - type: classLike
+          value: '^App\\Shared\\.*'
+  ruleset:
+    Application:
+      - Domain
+      - SharedKernel
+    Domain:
+      - SharedKernel
+    SharedKernel:
+      - ExternalApplication
+      - ExternalDomain
+    ExternalApplication:
+      - Application
+      - Domain
+      - ExternalDomain
+      - SharedKernel
+    ExternalDomain:
+      - Application
+      - Domain
+      - ExternalApplication
+      - SharedKernel

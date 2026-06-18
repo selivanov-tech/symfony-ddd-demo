@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Support;
 
-use App\Domain\Loan\Service\NewYorkLotteryInterface;
+use App\Module\Loan\Domain\Service\NewYorkLotteryInterface;
 
 final class FixedNewYorkLottery implements NewYorkLotteryInterface
 {
