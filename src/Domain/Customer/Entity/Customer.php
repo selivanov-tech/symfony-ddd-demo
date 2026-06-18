@@ -2,8 +2,11 @@
 
 namespace App\Domain\Customer\Entity;
 
-use App\Domain\Customer\Exception\InvalidFICOScoreException;
 use App\Domain\Customer\ValueObject\Address;
+use App\Domain\Customer\ValueObject\Email;
+use App\Domain\Customer\ValueObject\FicoScore;
+use App\Domain\Customer\ValueObject\Phone;
+use App\Domain\Customer\ValueObject\Ssn;
 use App\Shared\Domain\Identity\UuidInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
@@ -12,8 +15,27 @@ use Doctrine\ORM\Mapping as ORM;
 class Customer
 {
     #[ORM\Id]
-    #[ORM\Column(type: 'uuid_binary', unique: true)]
+    #[ORM\Column(type: UuidInterface::class, unique: true)]
     private UuidInterface $id;
+
+    #[ORM\Column(type: Email::class, length: 255, unique: true)]
+    private Email $email;
+    #[ORM\Column(type: Phone::class, length: 10, unique: true)]
+    private Phone $phone;
+    #[ORM\Column(type: Ssn::class, length: 11, unique: true)]
+    private Ssn $ssn;
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $firstName;
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $lastName;
+    #[ORM\Column(type: 'date_immutable')]
+    private DateTimeImmutable $birthday;
+    #[ORM\Column(type: FicoScore::class)]
+    private FicoScore $ficoScore;
+    #[ORM\Embedded(class: Address::class)]
+    private Address $address;
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    private int $monthlyIncome;
 
     public function __construct(UuidInterface $id)
     {
@@ -25,40 +47,17 @@ class Customer
         return $this->id;
     }
 
-    #[ORM\Column(type: 'string', length: 255, unique: true)]
-    private string $email;
-    #[ORM\Column(type: 'string', length: 10, unique: true)]
-    private string $phone;
-    #[ORM\Column(type: 'string', length: 11, unique: true)]
-    private string $ssn;
-    #[ORM\Column(type: 'string', length: 255)]
-    private string $firstName;
-    #[ORM\Column(type: 'string', length: 255)]
-    private string $lastName;
-    #[ORM\Column(type: 'date_immutable')]
-    private DateTimeImmutable $birthday;
-    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
-    private int $ficoScore;
-    /**
-     * Address fast solution to simplify,
-     * better to store it as separate tables, and make relations
-     */
-    #[ORM\Column(type: 'json')]
-    private array $address;
-    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
-    private int $monthlyIncome;
-
-    public function getEmail(): string
+    public function getEmail(): Email
     {
         return $this->email;
     }
 
-    public function getPhone(): string
+    public function getPhone(): Phone
     {
         return $this->phone;
     }
 
-    public function getSsn(): string
+    public function getSsn(): Ssn
     {
         return $this->ssn;
     }
@@ -89,19 +88,14 @@ class Customer
         return $this->birthday->diff(new DateTimeImmutable())->y;
     }
 
-    public function getFicoScore(): int
+    public function getFicoScore(): FicoScore
     {
         return $this->ficoScore;
     }
 
     public function getAddress(): Address
     {
-        return new Address(
-            street: $this->address['street'],
-            city: $this->address['city'],
-            state: $this->address['state'],
-            zip: $this->address['zip']
-        );
+        return $this->address;
     }
 
     public function getMonthlyIncome(): int
@@ -111,19 +105,19 @@ class Customer
 
     public function setEmail(string $email): self
     {
-        $this->email = $email;
+        $this->email = new Email($email);
         return $this;
     }
 
     public function setPhone(string $phone): self
     {
-        $this->phone = $phone;
+        $this->phone = new Phone($phone);
         return $this;
     }
 
     public function setSsn(string $ssn): self
     {
-        $this->ssn = $ssn;
+        $this->ssn = new Ssn($ssn);
         return $this;
     }
 
@@ -147,18 +141,21 @@ class Customer
 
     public function setFicoScore(int $ficoScore): self
     {
-        if ($ficoScore < 300 || $ficoScore > 850) {
-            throw new InvalidFICOScoreException($ficoScore);
-        }
-
-        $this->ficoScore = $ficoScore;
-
+        $this->ficoScore = new FicoScore($ficoScore);
         return $this;
     }
 
+    /**
+     * @param array<string, mixed> $address
+     */
     public function setAddress(array $address): self
     {
-        $this->address = $address;
+        $this->address = new Address(
+            (string) $address['street'],
+            (string) $address['city'],
+            (string) $address['state'],
+            (string) $address['zip'],
+        );
         return $this;
     }
 

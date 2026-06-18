@@ -14,7 +14,7 @@ use Throwable;
 
 final class UuidType extends Type
 {
-    public const NAME = 'uuid_binary';
+    public const NAME = UuidInterface::class;
 
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {

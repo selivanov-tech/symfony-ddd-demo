@@ -11,7 +11,7 @@ use Doctrine\DBAL\Types\Type;
 
 final class MoneyType extends Type
 {
-    public const NAME = 'money';
+    public const NAME = Money::class;
 
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {

@@ -13,30 +13,6 @@ parameters:
 			path: src/Application/Request/Customer/AbstractBaseCustomerRequest.php
 
 		-
-			message: '#^Method App\\Domain\\Customer\\Entity\\Customer\:\:setAddress\(\) has parameter \$address with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Domain/Customer/Entity/Customer.php
-
-		-
-			message: '#^Property App\\Domain\\Customer\\Entity\\Customer\:\:\$address type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Domain/Customer/Entity/Customer.php
-
-		-
-			message: '#^Method App\\Domain\\Customer\\ValueObject\\Address\:\:fromRequestData\(\) has parameter \$data with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Domain/Customer/ValueObject/Address.php
-
-		-
-			message: '#^Method App\\Domain\\Customer\\ValueObject\\Address\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Domain/Customer/ValueObject/Address.php
-
-		-
 			message: '#^Method App\\Domain\\Loan\\Repository\\LoanRepositoryInterface\:\:findByCustomerId\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1

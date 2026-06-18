@@ -29,13 +29,13 @@ final class CustomerView
     {
         return new self(
             id: $customer->getId()->toString(),
-            email: $customer->getEmail(),
-            phone: $customer->getPhone(),
+            email: (string) $customer->getEmail(),
+            phone: (string) $customer->getPhone(),
             firstName: $customer->getFirstName(),
             lastName: $customer->getLastName(),
             fullName: $customer->getPresentedName(),
             birthday: $customer->getBirthday()->format('Y-m-d'),
-            ficoScore: $customer->getFicoScore(),
+            ficoScore: $customer->getFicoScore()->value,
             address: $customer->getAddress()->toArray(),
             monthlyIncome: $customer->getMonthlyIncome(),
         );
