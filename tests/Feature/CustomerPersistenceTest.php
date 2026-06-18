@@ -14,7 +14,7 @@ final class CustomerPersistenceTest extends DatabaseTestCase
 
     public function testValueObjectsAndEmbeddedAddressRoundTripThroughDoctrine(): void
     {
-        $customer = $this->createCustomer($this->em, ['email' => 'round.trip@example.com', 'ficoScore' => 815]);
+        $customer = $this->createCustomer($this->em, $this->customerBuilder()->withEmail('round.trip@example.com')->withFicoScore(815));
         $id = $customer->getId();
 
         $this->em->clear();

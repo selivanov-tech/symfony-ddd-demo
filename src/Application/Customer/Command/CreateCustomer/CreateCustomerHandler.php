@@ -21,16 +21,18 @@ final class CreateCustomerHandler
 
     public function __invoke(CreateCustomerCommand $command): string
     {
-        $customer = (new Customer($this->uuidFactory->uuid7()))
-            ->setEmail($command->email)
-            ->setPhone($command->phone)
-            ->setSsn($command->ssn)
-            ->setFirstName($command->firstName)
-            ->setLastName($command->lastName)
-            ->setBirthday(new DateTimeImmutable($command->birthday))
-            ->setFicoScore($command->ficoScore)
-            ->setAddress($command->address)
-            ->setMonthlyIncome($command->monthlyIncome);
+        $customer = Customer::create(
+            $this->uuidFactory->uuid7(),
+            $command->email,
+            $command->phone,
+            $command->ssn,
+            $command->firstName,
+            $command->lastName,
+            new DateTimeImmutable($command->birthday),
+            $command->ficoScore,
+            $command->address,
+            $command->monthlyIncome,
+        );
 
         $this->customers->save($customer);
 

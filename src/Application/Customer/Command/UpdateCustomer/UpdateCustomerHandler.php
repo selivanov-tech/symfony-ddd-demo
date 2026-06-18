@@ -21,32 +21,30 @@ final class UpdateCustomerHandler
     {
         $customer = $this->customers->findById($command->id) ?? throw new CustomerNotFoundException();
 
-        if ($command->email !== null) {
-            $customer->setEmail($command->email);
+        if ($command->email !== null || $command->phone !== null || $command->address !== null) {
+            $customer->changeContactDetails(
+                $command->email ?? (string) $customer->getEmail(),
+                $command->phone ?? (string) $customer->getPhone(),
+                $command->address ?? $customer->getAddress()->toArray(),
+            );
         }
-        if ($command->phone !== null) {
-            $customer->setPhone($command->phone);
+        if ($command->firstName !== null || $command->lastName !== null) {
+            $customer->rename(
+                $command->firstName ?? $customer->getFirstName(),
+                $command->lastName ?? $customer->getLastName(),
+            );
         }
         if ($command->birthday !== null) {
-            $customer->setBirthday(new DateTimeImmutable($command->birthday));
-        }
-        if ($command->firstName !== null) {
-            $customer->setFirstName($command->firstName);
-        }
-        if ($command->lastName !== null) {
-            $customer->setLastName($command->lastName);
+            $customer->correctBirthday(new DateTimeImmutable($command->birthday));
         }
         if ($command->ssn !== null) {
-            $customer->setSsn($command->ssn);
+            $customer->correctSsn($command->ssn);
         }
         if ($command->ficoScore !== null) {
-            $customer->setFicoScore($command->ficoScore);
-        }
-        if ($command->address !== null) {
-            $customer->setAddress($command->address);
+            $customer->recordFicoScore($command->ficoScore);
         }
         if ($command->monthlyIncome !== null) {
-            $customer->setMonthlyIncome($command->monthlyIncome);
+            $customer->recordMonthlyIncome($command->monthlyIncome);
         }
 
         $this->customers->save($customer);

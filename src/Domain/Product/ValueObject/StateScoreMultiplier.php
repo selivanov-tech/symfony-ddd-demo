@@ -61,13 +61,11 @@ class StateScoreMultiplier
 
     public function applyRule(Product $product): void
     {
-        $interestRate = $product->getInterestRate();
+        $delta = (float) $this->value;
 
-        $newRate = match ($this->operation) {
-            StateScoreMultiplierOperationEnum::PLUS => $interestRate + $this->value,
-            StateScoreMultiplierOperationEnum::MINUS => $interestRate - $this->value,
+        match ($this->operation) {
+            StateScoreMultiplierOperationEnum::PLUS => $product->increaseInterestRate($delta),
+            StateScoreMultiplierOperationEnum::MINUS => $product->decreaseInterestRate($delta),
         };
-
-        $product->setInterestRate($newRate);
     }
 }

@@ -4,26 +4,17 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Domain\Customer;
 
-use App\Domain\Customer\Entity\Customer;
 use App\Domain\Customer\Exception\InvalidFICOScoreException;
 use App\Domain\Customer\ValueObject\Address;
-use App\Shared\Domain\Identity\UuidFactoryInterface;
-use App\Shared\Infrastructure\Identity\SymfonyUuidFactory;
+use App\Tests\Builder\CustomerBuilder;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class CustomerTest extends TestCase
 {
-    private UuidFactoryInterface $uuid;
-
-    protected function setUp(): void
-    {
-        $this->uuid = new SymfonyUuidFactory();
-    }
-
     public function testItAcceptsAValidFicoScore(): void
     {
-        $customer = (new Customer($this->uuid->uuid7()))->setFicoScore(700);
+        $customer = (new CustomerBuilder())->withFicoScore(700)->build();
 
         self::assertSame(700, $customer->getFicoScore()->value);
     }
@@ -41,33 +32,31 @@ final class CustomerTest extends TestCase
     {
         $this->expectException(InvalidFICOScoreException::class);
 
-        (new Customer($this->uuid->uuid7()))->setFicoScore($score);
+        (new CustomerBuilder())->withFicoScore($score)->build();
     }
 
     public function testItComputesAgeFromBirthday(): void
     {
-        $customer = (new Customer($this->uuid->uuid7()))->setBirthday(new \DateTimeImmutable('1980-01-01'));
+        $customer = (new CustomerBuilder())->withBirthday(new \DateTimeImmutable('1980-01-01'))->build();
 
         self::assertGreaterThanOrEqual(40, $customer->getAge());
     }
 
     public function testItExposesThePresentedName(): void
     {
-        $customer = (new Customer($this->uuid->uuid7()))
-            ->setFirstName('Jane')
-            ->setLastName('Doe');
+        $customer = (new CustomerBuilder())->withFirstName('Jane')->withLastName('Doe')->build();
 
         self::assertSame('Jane Doe', $customer->getPresentedName());
     }
 
-    public function testItRebuildsTheAddressValueObject(): void
+    public function testItExposesTheAddressValueObject(): void
     {
-        $customer = (new Customer($this->uuid->uuid7()))->setAddress([
+        $customer = (new CustomerBuilder())->withAddress([
             'street' => '1 Market St',
             'city' => 'San Francisco',
             'state' => 'CA',
             'zip' => '94105',
-        ]);
+        ])->build();
 
         $address = $customer->getAddress();
 
