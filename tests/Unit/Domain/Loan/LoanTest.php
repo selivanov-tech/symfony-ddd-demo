@@ -12,6 +12,8 @@ use App\Domain\Product\Entity\Product;
 use App\Shared\Domain\Identity\UuidFactoryInterface;
 use App\Shared\Domain\ValueObject\Money;
 use App\Shared\Infrastructure\Identity\SymfonyUuidFactory;
+use App\Tests\Builder\CustomerBuilder;
+use App\Tests\Builder\ProductBuilder;
 use PHPUnit\Framework\TestCase;
 
 final class LoanTest extends TestCase
@@ -64,11 +66,11 @@ final class LoanTest extends TestCase
 
     private function customer(): Customer
     {
-        return new Customer($this->uuid->uuid7());
+        return (new CustomerBuilder($this->uuid))->build();
     }
 
     private function product(): Product
     {
-        return new Product($this->uuid->uuid7());
+        return (new ProductBuilder($this->uuid))->build();
     }
 }

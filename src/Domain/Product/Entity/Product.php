@@ -15,16 +15,6 @@ class Product
     #[ORM\Column(type: UuidInterface::class, unique: true)]
     private UuidInterface $id;
 
-    public function __construct(UuidInterface $id)
-    {
-        $this->id = $id;
-    }
-
-    public function getId(): UuidInterface
-    {
-        return $this->id;
-    }
-
     #[ORM\Column(type: 'string', length: 255)]
     private string $name;
 
@@ -48,6 +38,71 @@ class Product
     private array $availableStates;
     #[ORM\Column(type: 'json')]
     private array $statesScoreMultipliers;
+
+    /**
+     * @param string[] $availableStates
+     */
+    private function __construct(
+        UuidInterface $id,
+        string $name,
+        int $termInMonths,
+        float $interestRate,
+        float $amount,
+        int $minFICOScore,
+        int $minMonthlyIncome,
+        int $minAge,
+        int $maxAge,
+        array $availableStates,
+        StatesScoreMultiplierCollection $statesScoreMultipliers,
+    ) {
+        $this->id = $id;
+        $this->name = $name;
+        $this->termInMonths = $termInMonths;
+        $this->interestRate = $interestRate;
+        $this->amount = $amount;
+        $this->minFICOScore = $minFICOScore;
+        $this->minMonthlyIncome = $minMonthlyIncome;
+        $this->minAge = $minAge;
+        $this->maxAge = $maxAge;
+        $this->availableStates = $availableStates;
+        $this->statesScoreMultipliers = $statesScoreMultipliers->toArray();
+    }
+
+    /**
+     * @param string[] $availableStates
+     */
+    public static function create(
+        UuidInterface $id,
+        string $name,
+        int $termInMonths,
+        float $interestRate,
+        float $amount,
+        int $minFICOScore,
+        int $minMonthlyIncome,
+        int $minAge,
+        int $maxAge,
+        array $availableStates,
+        StatesScoreMultiplierCollection $statesScoreMultipliers,
+    ): self {
+        return new self(
+            $id,
+            $name,
+            $termInMonths,
+            $interestRate,
+            $amount,
+            $minFICOScore,
+            $minMonthlyIncome,
+            $minAge,
+            $maxAge,
+            $availableStates,
+            $statesScoreMultipliers,
+        );
+    }
+
+    public function getId(): UuidInterface
+    {
+        return $this->id;
+    }
 
     public function getName(): string
     {
@@ -106,64 +161,13 @@ class Product
         );
     }
 
-    public function setName(string $name): self
+    public function increaseInterestRate(float $amount): void
     {
-        $this->name = $name;
-        return $this;
+        $this->interestRate += $amount;
     }
 
-    public function setTermInMonths(int $termInMonths): self
+    public function decreaseInterestRate(float $amount): void
     {
-        $this->termInMonths = $termInMonths;
-        return $this;
+        $this->interestRate -= $amount;
     }
-
-    public function setInterestRate(float $interestRate): self
-    {
-        $this->interestRate = $interestRate;
-        return $this;
-    }
-
-    public function setAmount(float $amount): self
-    {
-        $this->amount = $amount;
-        return $this;
-    }
-
-    public function setMinFICOScore(int $minFICOScore): self
-    {
-        $this->minFICOScore = $minFICOScore;
-        return $this;
-    }
-
-    public function setMinMonthlyIncome(int $minMonthlyIncome): self
-    {
-        $this->minMonthlyIncome = $minMonthlyIncome;
-        return $this;
-    }
-
-    public function setMinAge(int $minAge): self
-    {
-        $this->minAge = $minAge;
-        return $this;
-    }
-
-    public function setMaxAge(int $maxAge): self
-    {
-        $this->maxAge = $maxAge;
-        return $this;
-    }
-
-    public function setAvailableStates(array $availableStates): self
-    {
-        $this->availableStates = $availableStates;
-        return $this;
-    }
-
-    public function setStatesScoreMultipliers(StatesScoreMultiplierCollection $multipliers): self
-    {
-        $this->statesScoreMultipliers = $multipliers->toArray();
-        return $this;
-    }
-
 }

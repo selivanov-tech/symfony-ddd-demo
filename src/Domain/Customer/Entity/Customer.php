@@ -37,9 +37,57 @@ class Customer
     #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
     private int $monthlyIncome;
 
-    public function __construct(UuidInterface $id)
-    {
+    private function __construct(
+        UuidInterface $id,
+        Email $email,
+        Phone $phone,
+        Ssn $ssn,
+        string $firstName,
+        string $lastName,
+        DateTimeImmutable $birthday,
+        FicoScore $ficoScore,
+        Address $address,
+        int $monthlyIncome,
+    ) {
         $this->id = $id;
+        $this->email = $email;
+        $this->phone = $phone;
+        $this->ssn = $ssn;
+        $this->firstName = $firstName;
+        $this->lastName = $lastName;
+        $this->birthday = $birthday;
+        $this->ficoScore = $ficoScore;
+        $this->address = $address;
+        $this->monthlyIncome = $monthlyIncome;
+    }
+
+    /**
+     * @param array<string, mixed> $address
+     */
+    public static function create(
+        UuidInterface $id,
+        string $email,
+        string $phone,
+        string $ssn,
+        string $firstName,
+        string $lastName,
+        DateTimeImmutable $birthday,
+        int $ficoScore,
+        array $address,
+        int $monthlyIncome,
+    ): self {
+        return new self(
+            $id,
+            new Email($email),
+            new Phone($phone),
+            new Ssn($ssn),
+            $firstName,
+            $lastName,
+            $birthday,
+            new FicoScore($ficoScore),
+            self::buildAddress($address),
+            $monthlyIncome,
+        );
     }
 
     public function getId(): UuidInterface
@@ -103,65 +151,52 @@ class Customer
         return $this->monthlyIncome;
     }
 
-    public function setEmail(string $email): self
+    /**
+     * @param array<string, mixed> $address
+     */
+    public function changeContactDetails(string $email, string $phone, array $address): void
     {
         $this->email = new Email($email);
-        return $this;
-    }
-
-    public function setPhone(string $phone): self
-    {
         $this->phone = new Phone($phone);
-        return $this;
+        $this->address = self::buildAddress($address);
     }
 
-    public function setSsn(string $ssn): self
-    {
-        $this->ssn = new Ssn($ssn);
-        return $this;
-    }
-
-    public function setFirstName(string $firstName): self
+    public function rename(string $firstName, string $lastName): void
     {
         $this->firstName = $firstName;
-        return $this;
-    }
-
-    public function setLastName(string $lastName): self
-    {
         $this->lastName = $lastName;
-        return $this;
     }
 
-    public function setBirthday(DateTimeImmutable $birthday): self
+    public function correctBirthday(DateTimeImmutable $birthday): void
     {
         $this->birthday = $birthday;
-        return $this;
     }
 
-    public function setFicoScore(int $ficoScore): self
+    public function correctSsn(string $ssn): void
+    {
+        $this->ssn = new Ssn($ssn);
+    }
+
+    public function recordFicoScore(int $ficoScore): void
     {
         $this->ficoScore = new FicoScore($ficoScore);
-        return $this;
+    }
+
+    public function recordMonthlyIncome(int $monthlyIncome): void
+    {
+        $this->monthlyIncome = $monthlyIncome;
     }
 
     /**
      * @param array<string, mixed> $address
      */
-    public function setAddress(array $address): self
+    private static function buildAddress(array $address): Address
     {
-        $this->address = new Address(
+        return new Address(
             (string) $address['street'],
             (string) $address['city'],
             (string) $address['state'],
             (string) $address['zip'],
         );
-        return $this;
-    }
-
-    public function setMonthlyIncome(int $monthlyIncome): self
-    {
-        $this->monthlyIncome = $monthlyIncome;
-        return $this;
     }
 }
