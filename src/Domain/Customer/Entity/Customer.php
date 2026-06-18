@@ -4,14 +4,26 @@ namespace App\Domain\Customer\Entity;
 
 use App\Domain\Customer\Exception\InvalidFICOScoreException;
 use App\Domain\Customer\ValueObject\Address;
-use App\Domain\Shared\Entity\Traits\SharedEntityUuidTrait;
+use App\Shared\Domain\Identity\UuidInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 class Customer
 {
-    use SharedEntityUuidTrait;
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid_binary', unique: true)]
+    private UuidInterface $id;
+
+    public function __construct(UuidInterface $id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId(): UuidInterface
+    {
+        return $this->id;
+    }
 
     #[ORM\Column(type: 'string', length: 255, unique: true)]
     private string $email;

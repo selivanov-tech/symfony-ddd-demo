@@ -4,6 +4,7 @@ doctrine:
 
         types:
             money: App\Infrastructure\Persistence\Doctrine\Type\MoneyType
+            uuid_binary: App\Infrastructure\Persistence\Doctrine\Type\UuidType
 
         # IMPORTANT: You MUST configure your server version,
         # either here or in the DATABASE_URL env var (see .env file)

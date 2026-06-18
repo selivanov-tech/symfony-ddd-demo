@@ -9,18 +9,18 @@ use App\Domain\Loan\Event\LoanApproved;
 use App\Domain\Loan\Event\LoanRejected;
 use App\Domain\Product\Entity\Product;
 use App\Shared\Domain\Aggregate\AggregateRoot;
+use App\Shared\Domain\Identity\UuidFactoryInterface;
+use App\Shared\Domain\Identity\UuidInterface;
 use App\Shared\Domain\ValueObject\Money;
-use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Uid\UuidV7;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'loans')]
 class Loan extends AggregateRoot
 {
     #[ORM\Id]
-    #[ORM\Column]
-    private string $id;
+    #[ORM\Column(type: 'uuid_binary', unique: true)]
+    private UuidInterface $id;
 
     #[ORM\ManyToOne(targetEntity: Customer::class)]
     private Customer $customer;
@@ -37,9 +37,9 @@ class Loan extends AggregateRoot
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $rejectReason;
 
-    private function __construct(Customer $customer, Product $product, Money $amount, bool $approved, ?string $rejectReason)
+    private function __construct(UuidInterface $id, Customer $customer, Product $product, Money $amount, bool $approved, ?string $rejectReason)
     {
-        $this->id = (string) new UuidV7();
+        $this->id = $id;
         $this->customer = $customer;
         $this->product = $product;
         $this->amount = $amount;
@@ -47,23 +47,25 @@ class Loan extends AggregateRoot
         $this->rejectReason = $rejectReason;
     }
 
-    public static function approved(Customer $customer, Product $product, Money $amount): self
+    public static function approved(UuidFactoryInterface $uuidFactory, Customer $customer, Product $product, Money $amount): self
     {
-        $loan = new self($customer, $product, $amount, true, null);
-        $loan->recordEvent(new LoanApproved($loan->id, $customer->getId(), $amount));
+        $id = $uuidFactory->uuid7();
+        $loan = new self($id, $customer, $product, $amount, true, null);
+        $loan->recordEvent(new LoanApproved($id->toString(), $customer->getId()->toString(), $amount));
 
         return $loan;
     }
 
-    public static function rejected(Customer $customer, Product $product, Money $amount, string $reason): self
+    public static function rejected(UuidFactoryInterface $uuidFactory, Customer $customer, Product $product, Money $amount, string $reason): self
     {
-        $loan = new self($customer, $product, $amount, false, $reason);
-        $loan->recordEvent(new LoanRejected($loan->id, $customer->getId(), $amount, $reason));
+        $id = $uuidFactory->uuid7();
+        $loan = new self($id, $customer, $product, $amount, false, $reason);
+        $loan->recordEvent(new LoanRejected($id->toString(), $customer->getId()->toString(), $amount, $reason));
 
         return $loan;
     }
 
-    public function getId(): string
+    public function getId(): UuidInterface
     {
         return $this->id;
     }
@@ -91,10 +93,5 @@ class Loan extends AggregateRoot
     public function getRejectReason(): ?string
     {
         return $this->rejectReason;
-    }
-
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return (new UuidV7($this->id))->getDateTime();
     }
 }

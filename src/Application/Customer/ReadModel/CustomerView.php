@@ -28,7 +28,7 @@ final class CustomerView
     public static function fromCustomer(Customer $customer): self
     {
         return new self(
-            id: $customer->getId(),
+            id: $customer->getId()->toString(),
             email: $customer->getEmail(),
             phone: $customer->getPhone(),
             firstName: $customer->getFirstName(),

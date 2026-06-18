@@ -6,6 +6,7 @@ namespace App\Application\Customer\Command\CreateCustomer;
 
 use App\Domain\Customer\Entity\Customer;
 use App\Domain\Customer\Repository\CustomerRepositoryInterface;
+use App\Shared\Domain\Identity\UuidFactoryInterface;
 use DateTimeImmutable;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -14,12 +15,13 @@ final class CreateCustomerHandler
 {
     public function __construct(
         private readonly CustomerRepositoryInterface $customers,
+        private readonly UuidFactoryInterface $uuidFactory,
     ) {
     }
 
     public function __invoke(CreateCustomerCommand $command): string
     {
-        $customer = (new Customer())
+        $customer = (new Customer($this->uuidFactory->uuid7()))
             ->setEmail($command->email)
             ->setPhone($command->phone)
             ->setSsn($command->ssn)
@@ -32,6 +34,6 @@ final class CreateCustomerHandler
 
         $this->customers->save($customer);
 
-        return $customer->getId();
+        return $customer->getId()->toString();
     }
 }

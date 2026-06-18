@@ -7,14 +7,23 @@ namespace App\Tests\Unit\Domain\Customer;
 use App\Domain\Customer\Entity\Customer;
 use App\Domain\Customer\Exception\InvalidFICOScoreException;
 use App\Domain\Customer\ValueObject\Address;
+use App\Shared\Domain\Identity\UuidFactoryInterface;
+use App\Shared\Infrastructure\Identity\SymfonyUuidFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class CustomerTest extends TestCase
 {
+    private UuidFactoryInterface $uuid;
+
+    protected function setUp(): void
+    {
+        $this->uuid = new SymfonyUuidFactory();
+    }
+
     public function testItAcceptsAValidFicoScore(): void
     {
-        $customer = (new Customer())->setFicoScore(700);
+        $customer = (new Customer($this->uuid->uuid7()))->setFicoScore(700);
 
         self::assertSame(700, $customer->getFicoScore());
     }
@@ -32,19 +41,19 @@ final class CustomerTest extends TestCase
     {
         $this->expectException(InvalidFICOScoreException::class);
 
-        (new Customer())->setFicoScore($score);
+        (new Customer($this->uuid->uuid7()))->setFicoScore($score);
     }
 
     public function testItComputesAgeFromBirthday(): void
     {
-        $customer = (new Customer())->setBirthday(new \DateTimeImmutable('1980-01-01'));
+        $customer = (new Customer($this->uuid->uuid7()))->setBirthday(new \DateTimeImmutable('1980-01-01'));
 
         self::assertGreaterThanOrEqual(40, $customer->getAge());
     }
 
     public function testItExposesThePresentedName(): void
     {
-        $customer = (new Customer())
+        $customer = (new Customer($this->uuid->uuid7()))
             ->setFirstName('Jane')
             ->setLastName('Doe');
 
@@ -53,7 +62,7 @@ final class CustomerTest extends TestCase
 
     public function testItRebuildsTheAddressValueObject(): void
     {
-        $customer = (new Customer())->setAddress([
+        $customer = (new Customer($this->uuid->uuid7()))->setAddress([
             'street' => '1 Market St',
             'city' => 'San Francisco',
             'state' => 'CA',

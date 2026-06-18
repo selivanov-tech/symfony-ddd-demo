@@ -58,5 +58,7 @@ services:
 
     App\Application\Notification\NotificationSenderInterface: '@App\Infrastructure\Service\Notification\NotificationService'
 
+    App\Shared\Domain\Identity\UuidFactoryInterface: '@App\Shared\Infrastructure\Identity\SymfonyUuidFactory'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

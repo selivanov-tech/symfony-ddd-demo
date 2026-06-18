@@ -18,7 +18,7 @@ final class LoanPersistenceTest extends DatabaseTestCase
         $customer = $this->createCustomer($this->em);
         $product = $this->createProduct($this->em);
 
-        $loan = Loan::approved($customer, $product, new Money(750000));
+        $loan = Loan::approved($this->uuidFactory(), $customer, $product, new Money(750000));
         $this->em->persist($loan);
         $this->em->flush();
         $loanId = $loan->getId();
@@ -32,6 +32,6 @@ final class LoanPersistenceTest extends DatabaseTestCase
 
         self::assertTrue($reloaded->isApproved());
         self::assertTrue($reloaded->getAmount()->equals(new Money(750000)));
-        self::assertSame($customer->getId(), $reloaded->getCustomer()->getId());
+        self::assertSame($customer->getId()->toString(), $reloaded->getCustomer()->getId()->toString());
     }
 }
