@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Feature;
 
-use App\Domain\Loan\Entity\Loan;
+use App\Module\Loan\Domain\Entity\Loan;
 use App\Shared\Domain\ValueObject\Money;
 use App\Tests\Support\DatabaseTestCase;
 use App\Tests\Support\LendingFixtures;

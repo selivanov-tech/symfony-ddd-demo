@@ -1,0 +1,44 @@
+# Layer fitness function: Domain <- Application <- Infrastructure, and a
+# Presentation layer (apps/) on top. Cross-module dependencies are NOT checked
+# here (all module Domains share one "Domain" layer); module boundaries live in
+# the per-module configs alongside this file.
+deptrac:
+  paths:
+    - ../src
+    - ../apps/api/src
+    - ../apps/cli/src
+  layers:
+    - name: Domain
+      collectors:
+        - type: classLike
+          value: '^App\\Module\\[^\\]+\\Domain\\.*'
+        - type: classLike
+          value: '^App\\Shared\\Domain\\.*'
+    - name: Application
+      collectors:
+        - type: classLike
+          value: '^App\\Module\\[^\\]+\\Application\\.*'
+        - type: classLike
+          value: '^App\\Shared\\Application\\.*'
+    - name: Infrastructure
+      collectors:
+        - type: classLike
+          value: '^App\\Module\\[^\\]+\\Infrastructure\\.*'
+        - type: classLike
+          value: '^App\\Shared\\Infrastructure\\.*'
+    - name: Presentation
+      collectors:
+        - type: classLike
+          value: '^Api\\.*'
+        - type: classLike
+          value: '^Cli\\.*'
+  ruleset:
+    Domain: ~
+    Application:
+      - Domain
+    Infrastructure:
+      - Application
+      - Domain
+    Presentation:
+      - Application
+      - Domain

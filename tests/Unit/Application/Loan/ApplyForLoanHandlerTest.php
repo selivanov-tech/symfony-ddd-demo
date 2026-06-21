@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Loan;
 
-use App\Application\Loan\Command\ApplyForLoan\ApplyForLoanCommand;
-use App\Application\Loan\Command\ApplyForLoan\ApplyForLoanHandler;
-use App\Domain\Customer\Entity\Customer;
-use App\Domain\Customer\Repository\CustomerRepositoryInterface;
-use App\Domain\Loan\Event\LoanApproved;
-use App\Domain\Loan\Event\LoanRejected;
-use App\Domain\Loan\Repository\LoanRepositoryInterface;
-use App\Domain\Loan\Service\LoanEligibilityChecker;
-use App\Domain\Product\Entity\Product;
-use App\Domain\Product\Repository\ProductRepositoryInterface;
+use App\Module\Customer\Domain\Entity\Customer;
+use App\Module\Customer\Domain\Repository\CustomerRepositoryInterface;
+use App\Module\Loan\Application\Command\ApplyForLoan\ApplyForLoanCommand;
+use App\Module\Loan\Application\Command\ApplyForLoan\ApplyForLoanHandler;
+use App\Module\Loan\Domain\Event\LoanApproved;
+use App\Module\Loan\Domain\Event\LoanRejected;
+use App\Module\Loan\Domain\Repository\LoanRepositoryInterface;
+use App\Module\Loan\Domain\Service\LoanEligibilityChecker;
+use App\Module\Product\Domain\Entity\Product;
+use App\Module\Product\Domain\Repository\ProductRepositoryInterface;
 use App\Shared\Domain\Identity\UuidFactoryInterface;
 use App\Shared\Infrastructure\Identity\SymfonyUuidFactory;
 use App\Tests\Builder\CustomerBuilder;

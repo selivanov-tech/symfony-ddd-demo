@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Builder;
 
-use App\Domain\Product\Entity\Product;
-use App\Domain\Product\ValueObject\StatesScoreMultiplierCollection;
+use App\Module\Product\Domain\Entity\Product;
+use App\Module\Product\Domain\ValueObject\StatesScoreMultiplierCollection;
 use App\Shared\Domain\Identity\UuidFactoryInterface;
 use App\Shared\Domain\Identity\UuidInterface;
 use App\Shared\Infrastructure\Identity\SymfonyUuidFactory;
