@@ -194,10 +194,11 @@ A few notes on the setup:
   under `tools/` so their dependencies can't clash with the app's Symfony 7.1 pin.
 - **Module boundaries.** A layer config (`deptrac/layers.yaml`) plus one boundary config
   per module (`deptrac/module-*.yaml`) keep modules isolated; cross-module calls are
-  allowed only from Infrastructure. The loan eligibility flow still reads Customer/Product
-  directly from its Domain/Application — those crossings are recorded in
-  `deptrac/loan-baseline.yaml` as tracked debt, to be moved behind Loan-owned ports (an
-  anti-corruption layer) in a follow-up.
+  allowed only from Infrastructure. The loan eligibility flow reaches Customer/Product
+  through an **anti-corruption layer**: Loan defines its own read-model ports
+  (`Application/Repository/*ReadModelRepositoryInterface`) returning Loan-owned DTOs, and the
+  adapters that map the foreign aggregates live in Loan's Infrastructure. So Loan's
+  Domain/Application stay clean and the boundary holds with **no baselined violations**.
 
 ## Notes
 

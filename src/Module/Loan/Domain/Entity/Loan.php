@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App\Module\Loan\Domain\Entity;
 
-use App\Module\Customer\Domain\Entity\Customer;
 use App\Module\Loan\Domain\Event\LoanApproved;
 use App\Module\Loan\Domain\Event\LoanRejected;
-use App\Module\Product\Domain\Entity\Product;
 use App\Shared\Domain\Aggregate\AggregateRoot;
 use App\Shared\Domain\Identity\UuidFactoryInterface;
 use App\Shared\Domain\Identity\UuidInterface;
@@ -22,11 +20,11 @@ class Loan extends AggregateRoot
     #[ORM\Column(type: UuidInterface::class, unique: true)]
     private UuidInterface $id;
 
-    #[ORM\ManyToOne(targetEntity: Customer::class)]
-    private Customer $customer;
+    #[ORM\Column(type: UuidInterface::class)]
+    private UuidInterface $customerId;
 
-    #[ORM\ManyToOne(targetEntity: Product::class)]
-    private Product $product;
+    #[ORM\Column(type: UuidInterface::class)]
+    private UuidInterface $productId;
 
     #[ORM\Column(type: Money::class)]
     private Money $amount;
@@ -37,30 +35,30 @@ class Loan extends AggregateRoot
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $rejectReason;
 
-    private function __construct(UuidInterface $id, Customer $customer, Product $product, Money $amount, bool $approved, ?string $rejectReason)
+    private function __construct(UuidInterface $id, UuidInterface $customerId, UuidInterface $productId, Money $amount, bool $approved, ?string $rejectReason)
     {
         $this->id = $id;
-        $this->customer = $customer;
-        $this->product = $product;
+        $this->customerId = $customerId;
+        $this->productId = $productId;
         $this->amount = $amount;
         $this->approved = $approved;
         $this->rejectReason = $rejectReason;
     }
 
-    public static function approved(UuidFactoryInterface $uuidFactory, Customer $customer, Product $product, Money $amount): self
+    public static function approved(UuidFactoryInterface $uuidFactory, UuidInterface $customerId, UuidInterface $productId, Money $amount): self
     {
         $id = $uuidFactory->uuid7();
-        $loan = new self($id, $customer, $product, $amount, true, null);
-        $loan->recordEvent(new LoanApproved($id->toString(), $customer->getId()->toString(), $amount));
+        $loan = new self($id, $customerId, $productId, $amount, true, null);
+        $loan->recordEvent(new LoanApproved($id->toString(), $customerId->toString(), $amount));
 
         return $loan;
     }
 
-    public static function rejected(UuidFactoryInterface $uuidFactory, Customer $customer, Product $product, Money $amount, string $reason): self
+    public static function rejected(UuidFactoryInterface $uuidFactory, UuidInterface $customerId, UuidInterface $productId, Money $amount, string $reason): self
     {
         $id = $uuidFactory->uuid7();
-        $loan = new self($id, $customer, $product, $amount, false, $reason);
-        $loan->recordEvent(new LoanRejected($id->toString(), $customer->getId()->toString(), $amount, $reason));
+        $loan = new self($id, $customerId, $productId, $amount, false, $reason);
+        $loan->recordEvent(new LoanRejected($id->toString(), $customerId->toString(), $amount, $reason));
 
         return $loan;
     }
@@ -70,14 +68,14 @@ class Loan extends AggregateRoot
         return $this->id;
     }
 
-    public function getCustomer(): Customer
+    public function getCustomerId(): UuidInterface
     {
-        return $this->customer;
+        return $this->customerId;
     }
 
-    public function getProduct(): Product
+    public function getProductId(): UuidInterface
     {
-        return $this->product;
+        return $this->productId;
     }
 
     public function getAmount(): Money

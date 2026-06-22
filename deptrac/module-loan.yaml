@@ -2,13 +2,10 @@
 # itself + the shared kernel, never on another module. Infrastructure is left
 # uncollected on purpose: cross-module integration is allowed there only.
 #
-# Loan currently reads Customer + Product from its Domain/Application (the loan
-# eligibility flow consumes their entities and repository interfaces directly).
-# Those known crossings are recorded in loan-baseline.yaml as tracked debt; the
-# anti-corruption-layer refactor that moves them behind Loan-owned ports is a
-# planned follow-up.
-imports:
-  - loan-baseline.yaml
+# Loan reads Customer + Product through its own read-model ports
+# (Application/Repository/*ReadModelRepositoryInterface). The adapters that fetch
+# from those contexts live in Loan's Infrastructure, so Domain/Application stay
+# clean and this boundary holds with no baselined violations.
 deptrac:
   paths:
     - ../src

@@ -15,10 +15,10 @@ final class LoanPersistenceTest extends DatabaseTestCase
 
     public function testLoanWithMoneyRoundTripsThroughDoctrine(): void
     {
-        $customer = $this->createCustomer($this->em);
-        $product = $this->createProduct($this->em);
+        $customerId = $this->uuidFactory()->uuid7();
+        $productId = $this->uuidFactory()->uuid7();
 
-        $loan = Loan::approved($this->uuidFactory(), $customer, $product, new Money(750000));
+        $loan = Loan::approved($this->uuidFactory(), $customerId, $productId, new Money(750000));
         $this->em->persist($loan);
         $this->em->flush();
         $loanId = $loan->getId();
@@ -32,6 +32,6 @@ final class LoanPersistenceTest extends DatabaseTestCase
 
         self::assertTrue($reloaded->isApproved());
         self::assertTrue($reloaded->getAmount()->equals(new Money(750000)));
-        self::assertSame($customer->getId()->toString(), $reloaded->getCustomer()->getId()->toString());
+        self::assertSame($customerId->toString(), $reloaded->getCustomerId()->toString());
     }
 }
