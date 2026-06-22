@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/selivanov-tech/symfony-ddd-demo/actions/workflows/ci.yml/badge.svg)](https://github.com/selivanov-tech/symfony-ddd-demo/actions/workflows/ci.yml)
 
-A small **Symfony 7.1** backend that shows a clean **Domain-Driven Design** layout with
+A small **Symfony 7.4** backend that shows a clean **Domain-Driven Design** layout with
 **CQRS** message buses. It models a simple lending flow: create customers, define loan
 products, and check whether a customer is eligible for a loan.
 
@@ -123,7 +123,7 @@ apps/                           # presentation layer — one app per transport
 
 ## Tech stack
 
-- PHP 8.2+ · Symfony 7.1 (framework-bundle, messenger, serializer, validator, uid, notifier)
+- PHP 8.2+ · Symfony 7.4 (framework-bundle, messenger, serializer, validator, uid, notifier)
 - Doctrine ORM 3 + migrations (value objects persisted via custom DBAL types)
 - SQLite by default (PostgreSQL-ready — see `DATABASE_URL` in `.env`)
 - Docker + Docker Compose, with `make` helpers
@@ -201,7 +201,7 @@ A few notes on the setup:
 - **PHPStan baseline.** `phpstan-baseline.neon` captures pre-existing findings so the
   build is green today while new code is held to level 6. Burn it down over time.
 - **Isolated tools.** PHP-CS-Fixer and deptrac each live in their own composer project
-  under `tools/` so their dependencies can't clash with the app's Symfony 7.1 pin.
+  under `tools/` so their dependencies can't clash with the app's Symfony 7.4 pin.
 - **Module boundaries.** A layer config (`deptrac/layers.yaml`) plus one boundary config
   per module (`deptrac/module-*.yaml`) keep modules isolated; cross-module calls are
   allowed only from Infrastructure. The loan eligibility flow reaches Customer/Product

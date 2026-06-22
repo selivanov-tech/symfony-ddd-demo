@@ -42,14 +42,14 @@ class Address
         $constraint = new Assert\Collection([
             'street' => new Assert\NotBlank(),
             'city' => new Assert\NotBlank(),
-            'state' => new Assert\Choice([
-                'choices' => self::STATES,
-                'message' => 'Invalid state. Please use a valid U.S. state abbreviation.',
-            ]),
-            'zip' => new Assert\Regex([
-                'pattern' => self::ZIP_REGEX,
-                'message' => 'The ZIP code must be in the format 12345 or 12345-6789.',
-            ]),
+            'state' => new Assert\Choice(
+                choices: self::STATES,
+                message: 'Invalid state. Please use a valid U.S. state abbreviation.',
+            ),
+            'zip' => new Assert\Regex(
+                pattern: self::ZIP_REGEX,
+                message: 'The ZIP code must be in the format 12345 or 12345-6789.',
+            ),
         ]);
 
         $violations = Validation::createValidator()->validate($data, $constraint);
