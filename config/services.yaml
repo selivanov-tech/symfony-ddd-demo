@@ -22,6 +22,7 @@ services:
             - '../src/**/Entity/'
             - '../src/**/ValueObject/'
             - '../src/Module/*/Domain/Repository/'
+            - '../src/Module/*/Application/Repository/'
             - '../src/**/DependencyInjection/'
 
     # Presentation — API app (listeners, response shaping, controllers).
@@ -74,6 +75,11 @@ services:
     App\Module\Customer\Domain\Repository\CustomerRepositoryInterface: '@App\Module\Customer\Infrastructure\Repository\CustomerRepository'
     App\Module\Loan\Domain\Repository\LoanRepositoryInterface: '@App\Module\Loan\Infrastructure\Repository\LoanRepository'
     App\Module\Product\Domain\Repository\ProductRepositoryInterface: '@App\Module\Product\Infrastructure\Repository\ProductRepository'
+
+    # Loan read-model ports (Application) bound to their anti-corruption adapters (Infrastructure),
+    # which are the only Loan code allowed to read from the Customer / Product contexts.
+    App\Module\Loan\Application\Repository\ApplicantReadModelRepositoryInterface: '@App\Module\Loan\Infrastructure\Repository\ApplicantReadModelRepository'
+    App\Module\Loan\Application\Repository\ProductReadModelRepositoryInterface: '@App\Module\Loan\Infrastructure\Repository\ProductReadModelRepository'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

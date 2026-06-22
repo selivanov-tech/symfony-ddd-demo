@@ -2,9 +2,9 @@
 
 namespace App\Module\Loan\Domain\Service;
 
-use App\Module\Customer\Domain\Entity\Customer;
 use App\Module\Loan\Domain\Exception\LoanApplicationDeniedException;
-use App\Module\Product\Domain\Entity\Product;
+use App\Module\Loan\Domain\ValueObject\CreditProfile;
+use App\Module\Loan\Domain\ValueObject\ProductTerms;
 
 class LoanEligibilityChecker
 {
@@ -13,50 +13,37 @@ class LoanEligibilityChecker
     ) {
     }
 
-    public function isEligible(Product $product, Customer $customer): bool
+    public function isEligible(ProductTerms $terms, CreditProfile $applicant): bool
     {
-        $minFICO = $product->getMinFICOScore();
-        if ($customer->getFicoScore()->value < $minFICO) {
+        if ($applicant->ficoScore < $terms->minFicoScore) {
             throw new LoanApplicationDeniedException(
-                sprintf('Credit score too low, it should be at least %d.', $minFICO)
+                sprintf('Credit score too low, it should be at least %d.', $terms->minFicoScore)
             );
         }
 
-        $minMonthlyIncome = $product->getMinMonthlyIncome();
-        if ($customer->getMonthlyIncome() < $minMonthlyIncome) {
+        if ($applicant->monthlyIncome < $terms->minMonthlyIncome) {
             throw new LoanApplicationDeniedException(
-                sprintf('Monthly income too low, it should be more than %d.', $minMonthlyIncome)
+                sprintf('Monthly income too low, it should be more than %d.', $terms->minMonthlyIncome)
             );
         }
 
-        $age = $customer->getAge();
-        $minAge = $product->getMinAge();
-        $maxAge = $product->getMaxAge();
-        if ($age < $minAge || $age > $maxAge) {
+        if ($applicant->age < $terms->minAge || $applicant->age > $terms->maxAge) {
             throw new LoanApplicationDeniedException(
-                sprintf('Age not eligible for a loan, it should be between %d and %d years.', $minAge, $maxAge)
+                sprintf('Age not eligible for a loan, it should be between %d and %d years.', $terms->minAge, $terms->maxAge)
             );
         }
 
-        $state = $customer->getAddress()->getState();
-
-        $availableStates = $product->getAvailableStates();
-        if (!in_array($state, $availableStates)) {
+        if (!in_array($applicant->state, $terms->availableStates)) {
             throw new LoanApplicationDeniedException(
                 sprintf(
                     'State not eligible for a loan, it should be in: %s.',
-                    implode(', ', $availableStates)
+                    implode(', ', $terms->availableStates)
                 )
             );
         }
 
-        if ($state === 'NY' && $this->newYorkLottery->rejects()) {
+        if ($applicant->state === 'NY' && $this->newYorkLottery->rejects()) {
             throw new LoanApplicationDeniedException('Random rejection for NY state.', public: false);
-        }
-
-        $stateHasRule = $product->getStatesScoreMultipliers()->getRuleForState($state);
-        if ($stateHasRule !== null) {
-            $stateHasRule->applyRule($product);
         }
 
         return true;

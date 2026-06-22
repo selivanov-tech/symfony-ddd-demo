@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Domain\Loan;
 
-use App\Module\Customer\Domain\Entity\Customer;
 use App\Module\Loan\Domain\Exception\LoanApplicationDeniedException;
 use App\Module\Loan\Domain\Service\LoanEligibilityChecker;
-use App\Module\Product\Domain\Entity\Product;
-use App\Tests\Builder\CustomerBuilder;
-use App\Tests\Builder\ProductBuilder;
+use App\Module\Loan\Domain\ValueObject\CreditProfile;
+use App\Module\Loan\Domain\ValueObject\ProductTerms;
+use App\Tests\Builder\CreditProfileBuilder;
+use App\Tests\Builder\ProductTermsBuilder;
 use App\Tests\Support\FixedNewYorkLottery;
 use PHPUnit\Framework\TestCase;
 
@@ -25,7 +25,7 @@ final class LoanEligibilityCheckerTest extends TestCase
     public function testEligibleApplicantPasses(): void
     {
         self::assertTrue(
-            $this->checker->isEligible((new ProductBuilder())->build(), (new CustomerBuilder())->build())
+            $this->checker->isEligible((new ProductTermsBuilder())->build(), (new CreditProfileBuilder())->build())
         );
     }
 
@@ -35,8 +35,8 @@ final class LoanEligibilityCheckerTest extends TestCase
 
         try {
             $checker->isEligible(
-                (new ProductBuilder())->withAvailableStates(['CA', 'NY'])->build(),
-                (new CustomerBuilder())->withAddress($this->address('NY'))->build(),
+                (new ProductTermsBuilder())->withAvailableStates(['CA', 'NY'])->build(),
+                (new CreditProfileBuilder())->withState('NY')->build(),
             );
             self::fail('Expected LoanApplicationDeniedException was not thrown.');
         } catch (LoanApplicationDeniedException $exception) {
@@ -50,8 +50,8 @@ final class LoanEligibilityCheckerTest extends TestCase
 
         self::assertTrue(
             $checker->isEligible(
-                (new ProductBuilder())->withAvailableStates(['CA', 'NY'])->build(),
-                (new CustomerBuilder())->withAddress($this->address('NY'))->build(),
+                (new ProductTermsBuilder())->withAvailableStates(['CA', 'NY'])->build(),
+                (new CreditProfileBuilder())->withState('NY')->build(),
             )
         );
     }
@@ -59,8 +59,8 @@ final class LoanEligibilityCheckerTest extends TestCase
     public function testTooLowFicoIsDenied(): void
     {
         $reason = $this->denialReason(
-            (new ProductBuilder())->withMinFICOScore(800)->build(),
-            (new CustomerBuilder())->withFicoScore(700)->build(),
+            (new ProductTermsBuilder())->withMinFicoScore(800)->build(),
+            (new CreditProfileBuilder())->withFicoScore(700)->build(),
         );
 
         self::assertStringContainsString('Credit score too low', $reason);
@@ -69,8 +69,8 @@ final class LoanEligibilityCheckerTest extends TestCase
     public function testTooLowIncomeIsDenied(): void
     {
         $reason = $this->denialReason(
-            (new ProductBuilder())->withMinMonthlyIncome(10000)->build(),
-            (new CustomerBuilder())->withMonthlyIncome(3000)->build(),
+            (new ProductTermsBuilder())->withMinMonthlyIncome(10000)->build(),
+            (new CreditProfileBuilder())->withMonthlyIncome(3000)->build(),
         );
 
         self::assertStringContainsString('Monthly income too low', $reason);
@@ -79,8 +79,8 @@ final class LoanEligibilityCheckerTest extends TestCase
     public function testAgeOutsideRangeIsDenied(): void
     {
         $reason = $this->denialReason(
-            (new ProductBuilder())->withMinAge(18)->withMaxAge(25)->build(),
-            (new CustomerBuilder())->withBirthday(new \DateTimeImmutable('1980-01-01'))->build(),
+            (new ProductTermsBuilder())->withMinAge(18)->withMaxAge(25)->build(),
+            (new CreditProfileBuilder())->withAge(46)->build(),
         );
 
         self::assertStringContainsString('Age not eligible', $reason);
@@ -89,29 +89,21 @@ final class LoanEligibilityCheckerTest extends TestCase
     public function testUnavailableStateIsDenied(): void
     {
         $reason = $this->denialReason(
-            (new ProductBuilder())->withAvailableStates(['NV'])->build(),
-            (new CustomerBuilder())->build(),
+            (new ProductTermsBuilder())->withAvailableStates(['NV'])->build(),
+            (new CreditProfileBuilder())->withState('CA')->build(),
         );
 
         self::assertStringContainsString('State not eligible', $reason);
     }
 
-    private function denialReason(Product $product, Customer $customer): string
+    private function denialReason(ProductTerms $terms, CreditProfile $applicant): string
     {
         try {
-            $this->checker->isEligible($product, $customer);
+            $this->checker->isEligible($terms, $applicant);
         } catch (LoanApplicationDeniedException $exception) {
             return $exception->getReason();
         }
 
         self::fail('Expected LoanApplicationDeniedException was not thrown.');
-    }
-
-    /**
-     * @return array{street: string, city: string, state: string, zip: string}
-     */
-    private function address(string $state): array
-    {
-        return ['street' => '1 Market St', 'city' => 'San Francisco', 'state' => $state, 'zip' => '94105'];
     }
 }
