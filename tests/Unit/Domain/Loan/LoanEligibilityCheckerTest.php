@@ -58,7 +58,7 @@ final class LoanEligibilityCheckerTest extends TestCase
 
     public function testTooLowFicoIsDenied(): void
     {
-        $reason = $this->denialReason(
+        $reason = $this->getDenialReason(
             (new ProductTermsBuilder())->withMinFicoScore(800)->build(),
             (new CreditProfileBuilder())->withFicoScore(700)->build(),
         );
@@ -68,7 +68,7 @@ final class LoanEligibilityCheckerTest extends TestCase
 
     public function testTooLowIncomeIsDenied(): void
     {
-        $reason = $this->denialReason(
+        $reason = $this->getDenialReason(
             (new ProductTermsBuilder())->withMinMonthlyIncome(10000)->build(),
             (new CreditProfileBuilder())->withMonthlyIncome(3000)->build(),
         );
@@ -78,7 +78,7 @@ final class LoanEligibilityCheckerTest extends TestCase
 
     public function testAgeOutsideRangeIsDenied(): void
     {
-        $reason = $this->denialReason(
+        $reason = $this->getDenialReason(
             (new ProductTermsBuilder())->withMinAge(18)->withMaxAge(25)->build(),
             (new CreditProfileBuilder())->withAge(46)->build(),
         );
@@ -88,7 +88,7 @@ final class LoanEligibilityCheckerTest extends TestCase
 
     public function testUnavailableStateIsDenied(): void
     {
-        $reason = $this->denialReason(
+        $reason = $this->getDenialReason(
             (new ProductTermsBuilder())->withAvailableStates(['NV'])->build(),
             (new CreditProfileBuilder())->withState('CA')->build(),
         );
@@ -96,7 +96,7 @@ final class LoanEligibilityCheckerTest extends TestCase
         self::assertStringContainsString('State not eligible', $reason);
     }
 
-    private function denialReason(ProductTerms $terms, CreditProfile $applicant): string
+    private function getDenialReason(ProductTerms $terms, CreditProfile $applicant): string
     {
         try {
             $this->checker->isEligible($terms, $applicant);

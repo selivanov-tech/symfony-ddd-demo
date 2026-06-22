@@ -37,7 +37,7 @@ final class LoanDecisionNotifierTest extends TestCase
         $loans->method('findById')->with($loan->getId()->toString())->willReturn($loan);
 
         $applicants = $this->createMock(ApplicantReadModelRepositoryInterface::class);
-        $applicants->method('findById')->with($customerId->toString())->willReturn($this->applicant($customerId));
+        $applicants->method('findById')->with($customerId->toString())->willReturn($this->createApplicantProfile($customerId));
 
         $notifications = $this->createMock(NotificationSenderInterface::class);
         $notifications->expects(self::once())
@@ -66,7 +66,7 @@ final class LoanDecisionNotifierTest extends TestCase
         $notifier->onApproved(new LoanApproved('missing-loan', 'customer-1', new Money(500000)));
     }
 
-    private function applicant(UuidInterface $id): ApplicantProfile
+    private function createApplicantProfile(UuidInterface $id): ApplicantProfile
     {
         return new ApplicantProfile(
             $id,

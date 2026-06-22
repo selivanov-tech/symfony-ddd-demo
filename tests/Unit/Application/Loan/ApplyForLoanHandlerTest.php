@@ -34,8 +34,8 @@ final class ApplyForLoanHandlerTest extends TestCase
     public function testEligibleApplicantGetsAnApprovedLoanAndPublishesLoanApproved(): void
     {
         $spy = new SpyEventBus();
-        $applicant = $this->applicant();
-        $handler = $this->handler($applicant, $this->offer(), $spy);
+        $applicant = $this->createApplicantProfile();
+        $handler = $this->createHandler($applicant, $this->createProductOffer(), $spy);
 
         $decision = $handler(new ApplyForLoanCommand('product-1', 'customer-1'));
 
@@ -53,9 +53,9 @@ final class ApplyForLoanHandlerTest extends TestCase
     public function testIneligibleApplicantGetsARejectedLoanAndPublishesLoanRejected(): void
     {
         $spy = new SpyEventBus();
-        $handler = $this->handler(
-            $this->applicant(ficoScore: 500),
-            $this->offer(minFicoScore: 800),
+        $handler = $this->createHandler(
+            $this->createApplicantProfile(ficoScore: 500),
+            $this->createProductOffer(minFicoScore: 800),
             $spy,
         );
 
@@ -70,7 +70,7 @@ final class ApplyForLoanHandlerTest extends TestCase
         self::assertStringContainsString('Credit score too low', $event->reason);
     }
 
-    private function handler(ApplicantProfile $applicant, ProductOffer $offer, SpyEventBus $eventBus): ApplyForLoanHandler
+    private function createHandler(ApplicantProfile $applicant, ProductOffer $offer, SpyEventBus $eventBus): ApplyForLoanHandler
     {
         $products = $this->createMock(ProductReadModelRepositoryInterface::class);
         $products->method('findById')->willReturn($offer);
@@ -88,7 +88,7 @@ final class ApplyForLoanHandlerTest extends TestCase
         );
     }
 
-    private function applicant(int $ficoScore = 720): ApplicantProfile
+    private function createApplicantProfile(int $ficoScore = 720): ApplicantProfile
     {
         return new ApplicantProfile(
             $this->uuid->uuid7(),
@@ -99,7 +99,7 @@ final class ApplyForLoanHandlerTest extends TestCase
         );
     }
 
-    private function offer(int $minFicoScore = 600): ProductOffer
+    private function createProductOffer(int $minFicoScore = 600): ProductOffer
     {
         return new ProductOffer(
             $this->uuid->uuid7(),
