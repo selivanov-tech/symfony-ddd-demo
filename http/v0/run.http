@@ -1,6 +1,6 @@
 import test.http
 import customer.http
-#import loan.http
+import loan.http
 
 ### run all test.http requests
 run test.http
@@ -9,4 +9,4 @@ run test.http
 run customer.http
 
 ### run all loan.http requests
-#run loan.http
+run loan.http

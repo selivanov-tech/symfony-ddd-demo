@@ -52,8 +52,8 @@ flowchart LR
 - **Infrastructure** — the adapters: Doctrine repositories, value-object DBAL types, the
   Messenger bus adapters, and notifications.
 - **Presentation** (`apps/`) — thin entrypoints per transport: HTTP controllers in
-  `apps/api`, console commands in `apps/cli`. They validate input and dispatch onto the
-  buses; they never touch the domain directly.
+  `apps/api` (one invokable controller per action), console commands in `apps/cli`. They
+  validate input and dispatch onto the buses; they never touch the domain directly.
 
 ### CQRS buses
 
@@ -74,7 +74,7 @@ routing domain events to an async transport (or a transactional outbox) is a cha
 
 ```mermaid
 sequenceDiagram
-    participant Ctrl as LoanController
+    participant Ctrl as ApplyForLoanController
     participant Cmd as command.bus
     participant H as ApplyForLoanHandler
     participant Loan as Loan (aggregate)
@@ -125,6 +125,7 @@ apps/                           # presentation layer — one app per transport
 - Doctrine ORM 3 + migrations (value objects persisted via custom DBAL types)
 - SQLite by default (PostgreSQL-ready — see `DATABASE_URL` in `.env`)
 - Docker + Docker Compose, with `make` helpers
+- API docs: **OpenAPI 3** via NelmioApiDocBundle + **Swagger UI** at `/api/doc` (Twig-rendered)
 - Quality: PHPUnit (unit + feature), PHPStan (level 6), PHP-CS-Fixer, deptrac, GitHub Actions CI
 
 ## Run it
@@ -139,12 +140,19 @@ The app runs at `http://localhost:8000`.
 
 ### API (v0)
 
+Every endpoint is a single-action **invokable controller**. The API is described by an
+**OpenAPI 3** spec with an interactive **Swagger UI** — browse it at `/api/doc` (run
+`bin/console assets:install public` once if the UI assets are missing).
+
 | Method | Path | What it does |
 |---|---|---|
-| `POST`  | `/customer/create` | create a customer |
-| `GET`   | `/customer/{id}`   | get a customer (curated view model) |
-| `PATCH` | `/customer/{id}`   | update a customer |
-| `GET`   | `/loan/apply`      | check loan eligibility |
+| `POST`  | `/customer/create`   | create a customer |
+| `GET`   | `/customer/{id}`     | get a customer (curated view model) |
+| `PATCH` | `/customer/{id}`     | update a customer |
+| `GET`   | `/loan/eligibility`  | check loan eligibility |
+| `POST`  | `/loan/applications` | apply for a loan |
+| `GET`   | `/api/doc`           | Swagger UI (interactive docs) |
+| `GET`   | `/api/doc.json`      | OpenAPI 3 spec (JSON) |
 
 Ready-to-run request samples are in [`http/v0/`](http/v0/) (JetBrains HTTP client
 format). Run them with `make tests-http`.

@@ -1,0 +1,10 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: symfony-ddd-demo API
+            description: DDD/CQRS modular-monolith demo (loan eligibility).
+            version: 0.1.0
+    areas:
+        # Document only the business routes; this excludes /test and the /api/doc* endpoints themselves.
+        path_patterns:
+            - ^/(customer|loan)

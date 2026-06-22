@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class TestController
 {
     #[Route('test', name: 'test')]
-    public function test(): Response
+    public function __invoke(): Response
     {
         return new JsonResponse(['message' => 'test']);
     }
