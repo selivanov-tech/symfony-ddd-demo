@@ -61,18 +61,6 @@ parameters:
 			path: src/Shared/Application/Exception/AbstractNotFoundException.php
 
 		-
-			message: '#^Method App\\Shared\\Infrastructure\\Notification\\NotificationService\:\:__construct\(\) has parameter \$channels with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Shared/Infrastructure/Notification/NotificationService.php
-
-		-
-			message: '#^Parameter \#1 \$constraints of attribute class Symfony\\Component\\Validator\\Constraints\\All constructor expects array\<mixed\>\|null, Symfony\\Component\\Validator\\Constraints\\Type given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Shared/Infrastructure/Notification/NotificationService.php
-
-		-
 			message: '#^Class App\\Shared\\Infrastructure\\Persistence\\Doctrine\\AbstractDoctrineRepository extends generic class Doctrine\\Bundle\\DoctrineBundle\\Repository\\ServiceEntityRepository but does not specify its types\: T$#'
 			identifier: missingType.generics
 			count: 1
