@@ -4,10 +4,6 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    app.notification.channels:
-        - !php/enum App\Shared\Application\Notification\NotificationChannelEnum::EMAIL
-        - !php/enum App\Shared\Application\Notification\NotificationChannelEnum::SMS
-
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -43,10 +39,6 @@ services:
     Cli\:
         resource: '../apps/cli/src/'
 
-    App\Shared\Infrastructure\Notification\NotificationService:
-        arguments:
-            $channels: '%app.notification.channels%'
-
     # Bind each adapter to its own Messenger bus (autowiring would inject the default bus).
     App\Shared\Infrastructure\Bus\Messenger\MessengerCommandBus:
         arguments:
@@ -69,7 +61,7 @@ services:
 
     # Module ports — domain interface bound to its infrastructure adapter.
     App\Module\Loan\Domain\Service\NewYorkLotteryInterface: '@App\Module\Loan\Infrastructure\Service\RandomNewYorkLottery'
-    App\Shared\Application\Notification\NotificationSenderInterface: '@App\Shared\Infrastructure\Notification\NotificationService'
+    App\Shared\Application\Notification\NotificationSenderInterface: '@App\Shared\Infrastructure\Notification\LoggingNotificationSender'
 
     # Repository interfaces (Domain) bound to their Doctrine implementations (Infrastructure).
     App\Module\Customer\Domain\Repository\CustomerRepositoryInterface: '@App\Module\Customer\Infrastructure\Repository\CustomerRepository'

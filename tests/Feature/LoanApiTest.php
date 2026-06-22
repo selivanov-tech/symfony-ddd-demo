@@ -6,6 +6,7 @@ namespace App\Tests\Feature;
 
 use App\Tests\Support\DatabaseTestCase;
 use App\Tests\Support\LendingFixtures;
+use Symfony\Component\Uid\Uuid;
 
 final class LoanApiTest extends DatabaseTestCase
 {
@@ -34,6 +35,23 @@ final class LoanApiTest extends DatabaseTestCase
         $body = $this->responseJson();
         self::assertFalse($body['result']);
         self::assertArrayHasKey('reason', $body);
+    }
+
+    public function testApplyingForALoanRecordsADecision(): void
+    {
+        $customer = $this->createCustomer($this->em);
+        $product = $this->createProduct($this->em);
+
+        $this->jsonRequest('POST', '/loan/applications', [
+            'productId' => (string) $product->getId(),
+            'customerId' => (string) $customer->getId(),
+        ]);
+
+        self::assertResponseIsSuccessful();
+
+        $body = $this->responseJson();
+        self::assertTrue(Uuid::isValid((string) $body['id']));
+        self::assertTrue($body['result']);
     }
 
     private function eligibilityUri(string $productId, string $customerId): string

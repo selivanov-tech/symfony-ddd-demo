@@ -19,7 +19,9 @@ not to be a finished product.
   the rules and returns *eligible* or *denied* with a clear reason.
 - **Loan decisions & events** — applying for a loan builds a `Loan` aggregate that
   records a domain event (`LoanApproved` / `LoanRejected`). The event bus then drives a
-  notification (multi-channel, e.g. email / SMS).
+  notification through a swappable `NotificationSenderInterface` port — the demo ships a
+  logging adapter (no external service); a real Mailer/SMS adapter drops in behind the
+  same port.
 
 ## Architecture
 
