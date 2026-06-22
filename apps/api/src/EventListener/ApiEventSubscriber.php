@@ -31,6 +31,10 @@ class ApiEventSubscriber implements EventSubscriberInterface
 
     public function transformResponseToJson(ResponseEvent $event): void
     {
+        if (str_starts_with($event->getRequest()->getPathInfo(), '/api/doc')) {
+            return;
+        }
+
         $event->getResponse()->headers->set('Content-Type', 'application/json');
     }
 

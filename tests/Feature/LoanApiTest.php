@@ -38,6 +38,6 @@ final class LoanApiTest extends DatabaseTestCase
 
     private function eligibilityUri(string $productId, string $customerId): string
     {
-        return sprintf('/loan/apply?productId=%s&customerId=%s&onlyCheck=1', $productId, $customerId);
+        return sprintf('/loan/eligibility?productId=%s&customerId=%s', $productId, $customerId);
     }
 }

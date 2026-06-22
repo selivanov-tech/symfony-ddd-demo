@@ -1,0 +1,14 @@
+### GET check loan eligibility
+### Replace the ids with a product and customer that exist (see LendingFixtures in the tests).
+GET {{host}}/loan/eligibility?productId=0193b3e9-5a7c-7e2a-9f10-2c8b1d4e6f01&customerId=0193b3e9-7b1d-7c44-8a90-3f2e1a9c7d22
+
+### POST apply for a loan
+### Replace the ids as above. Note: this returns 200 only once a notifier transport is wired —
+### the synchronous loan-approval notification needs a mailer/queue (tracked as a follow-up).
+POST {{host}}/loan/applications
+Content-Type: application/json
+
+{
+  "productId": "0193b3e9-5a7c-7e2a-9f10-2c8b1d4e6f01",
+  "customerId": "0193b3e9-7b1d-7c44-8a90-3f2e1a9c7d22"
+}
